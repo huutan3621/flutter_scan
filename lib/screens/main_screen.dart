@@ -10,7 +10,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  String _scanResult = ''; // Biến để lưu kết quả quét
+  String _scanResult = ''; // save scan data
 
   final TextEditingController _textController = TextEditingController();
 
@@ -18,6 +18,11 @@ class _MainScreenState extends State<MainScreen> {
     if (_isValidQRCode(result) || _isValidBarcode(result)) {
       setState(() {
         _scanResult = result;
+        _textController.text = _scanResult;
+      });
+    } else if (_isValidTextFormat(result)) {
+      setState(() {
+        _scanResult = _extractNumberFromText(result);
         _textController.text = _scanResult;
       });
     } else {
@@ -28,16 +33,27 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   bool _isValidQRCode(String code) {
-    // Kiểm tra mã QR có phải 6 số bắt đầu bằng 9 không
+    // check string 6 characters and start with 9
     final regex = RegExp(r'^9\d{5}$');
     return regex.hasMatch(code);
   }
 
   bool _isValidBarcode(String code) {
-    // Kiểm tra mã vạch sản phẩm quốc tế (EAN-13)
-    final regex =
-        RegExp(r'^\d{13}$'); // Hoặc regex khác tùy vào chuẩn mã vạch bạn cần
+    // Check barcode
+    final regex = RegExp(r'^\d{13}$');
     return regex.hasMatch(code);
+  }
+
+  bool _isValidTextFormat(String text) {
+    // Check old Trung Son style
+    final regex = RegExp(r'^9\d{5};$');
+    return regex.hasMatch(text);
+  }
+
+  String _extractNumberFromText(String text) {
+    // Export 6 number from text if it is start with 9
+    final match = RegExp(r'^(9\d{5});').firstMatch(text);
+    return match?.group(1) ?? '';
   }
 
   List<List<String>> data = [
@@ -187,7 +203,6 @@ class _MainScreenState extends State<MainScreen> {
           text,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
-          softWrap: true,
         ),
       ),
     );
@@ -201,7 +216,6 @@ class _MainScreenState extends State<MainScreen> {
           text,
           style: const TextStyle(fontSize: 16),
           textAlign: TextAlign.center,
-          softWrap: true,
         ),
       ),
     );
