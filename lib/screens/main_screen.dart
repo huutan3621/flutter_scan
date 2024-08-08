@@ -10,10 +10,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  String _scanResult = ''; // save scan data
-
+  String _scanResult = '';
   final TextEditingController _textController = TextEditingController();
-
   void _handleScanResult(String result) {
     if (_isValidQRCode(result) || _isValidBarcode(result)) {
       setState(() {
@@ -33,27 +31,23 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   bool _isValidQRCode(String code) {
-    // check string 6 characters and start with 9
     final regex = RegExp(r'^9\d{5}$');
     return regex.hasMatch(code);
   }
 
   bool _isValidBarcode(String code) {
-    // Check barcode
     final regex = RegExp(r'^\d{13}$');
     return regex.hasMatch(code);
   }
 
   bool _isValidTextFormat(String text) {
-    // Check old Trung Son style
-    final regex = RegExp(r'^9\d{5};$');
+    final regex = RegExp(r'^9\d{5};');
     return regex.hasMatch(text);
   }
 
   String _extractNumberFromText(String text) {
-    // Export 6 number from text if it is start with 9
-    final match = RegExp(r'^(9\d{5});').firstMatch(text);
-    return match?.group(1) ?? '';
+    final match = RegExp(r'^9\d{5}').firstMatch(text);
+    return match?.group(0) ?? '';
   }
 
   List<List<String>> data = [
@@ -69,7 +63,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void dispose() {
-    _textController.dispose(); // Giải phóng controller khi không cần nữa
+    _textController.dispose();
     super.dispose();
   }
 
@@ -83,7 +77,7 @@ class _MainScreenState extends State<MainScreen> {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
-            // Top Row with Text Field and Buttons
+            //btn field
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -104,7 +98,7 @@ class _MainScreenState extends State<MainScreen> {
                       },
                       child: TextField(
                         enabled: false,
-                        controller: _textController, // Hiển thị kết quả quét
+                        controller: _textController, //display result here
                         decoration: const InputDecoration(
                           hintText: 'Scan item...',
                           border: OutlineInputBorder(),
