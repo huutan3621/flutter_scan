@@ -1,0 +1,142 @@
+{
+    "totalCount": 9,
+    "pageSize": 10,
+    "currentPage": 1,
+    "totalPages": 1,
+    "products": [
+      {
+        "itemCode": "900001",
+        "barCode": "900001a",
+        "unitOfMeasure": "Hop",
+        "length": 10,
+        "width": 10,
+        "height": 10,
+        "weight": 10,
+        "createDate": "2024-08-09T08:48:34.897",
+        "createBy": "Hieuth",
+        "images": [
+          {
+            "imageId": 1,
+            "productId": 1,
+            "type": "image/png",
+            "name": "sample-image.png",
+            "size": "123456",
+            "url": "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"
+          },
+          {
+            "imageId": 2,
+            "productId": 1,
+            "type": "image/png",
+            "name": "another-image.png",
+            "size": "789012",
+            "url": "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"
+          }
+        ]
+      },
+      {
+        "itemCode": "900001",
+        "barCode": "900001b",
+        "unitOfMeasure": "Hop",
+        "length": 10,
+        "width": 10,
+        "height": 10,
+        "weight": 10,
+        "createDate": "2024-08-09T08:48:34.897",
+        "createBy": "Hieuth",
+        "images": [ {
+            "imageId": 1,
+            "productId": 1,
+            "type": "image/png",
+            "name": "sample-image.png",
+            "size": "123456",
+            "url": "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"
+          }
+        ]
+      },
+      {
+        "itemCode": "900001",
+        "barCode": "900001c",
+        "unitOfMeasure": "Hop",
+        "length": 10,
+        "width": 10,
+        "height": 10,
+        "weight": 10,
+        "createDate": "2024-08-09T08:48:34.897",
+        "createBy": "Hieuth",
+        "images": []
+      },
+      {
+        "itemCode": "900001",
+        "barCode": "900001d",
+        "unitOfMeasure": "Hop",
+        "length": 10,
+        "width": 10,
+        "height": 10,
+        "weight": 10,
+        "createDate": "2024-08-09T08:48:34.897",
+        "createBy": "Hieuth",
+        "images": []
+      },
+      {
+        "itemCode": "900002",
+        "barCode": "string",
+        "unitOfMeasure": "string",
+        "length": 0,
+        "width": 0,
+        "height": 0,
+        "weight": 0,
+        "createDate": "2024-08-09T11:08:59.987",
+        "createBy": "string",
+        "images": []
+      },
+      {
+        "itemCode": "900001",
+        "barCode": "900001G",
+        "unitOfMeasure": "HOP",
+        "length": 10,
+        "width": 10,
+        "height": 10,
+        "weight": 10,
+        "createDate": "2024-08-09T11:21:58.61",
+        "createBy": "Hieuth",
+        "images": []
+      },
+      {
+        "itemCode": "900001",
+        "barCode": "900001GG",
+        "unitOfMeasure": "HOP",
+        "length": 10,
+        "width": 10,
+        "height": 10,
+        "weight": 10,
+        "createDate": "2024-08-09T11:33:55.233",
+        "createBy": "Hieuth",
+        "images": []
+      },
+      {
+        "itemCode": "900001",
+        "barCode": "9000011G",
+        "unitOfMeasure": "HOP",
+        "length": 10,
+        "width": 10,
+        "height": 10,
+        "weight": 10,
+        "createDate": "2024-08-09T11:38:19.687",
+        "createBy": "Hieuth",
+        "images": []
+      },
+      {
+        "itemCode": "900001",
+        "barCode": "900001AA",
+        "unitOfMeasure": "Hop",
+        "length": 10,
+        "width": 10,
+        "height": 10,
+        "weight": 10,
+        "createDate": "2024-08-09T11:58:52.247",
+        "createBy": "Hieuth",
+        "images": []
+      }
+    ]
+  }
+  

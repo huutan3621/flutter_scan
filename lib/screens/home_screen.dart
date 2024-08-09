@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/controller/home_provider.dart';
 
@@ -89,12 +88,13 @@ class _HomeChildState extends State<HomeChild> {
                       const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const CreateItemScreen(),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => const CreateItemScreen(),
+                          //   ),
+                          // );
+                          value.navigateToCreateScreen(context);
                         },
                         child: const Text('Create'),
                       ),
@@ -123,8 +123,16 @@ class _HomeChildState extends State<HomeChild> {
                           },
                           children: [
                             TableRow(
-                              children: List.generate(8,
-                                  (index) => _buildHeaderCell('Header $index')),
+                              children: [
+                                _buildHeaderCell('Item Code'),
+                                _buildHeaderCell('Bar Code'),
+                                _buildHeaderCell('Unit'),
+                                _buildHeaderCell('Length'),
+                                _buildHeaderCell('Width'),
+                                _buildHeaderCell('Height'),
+                                _buildHeaderCell('Weight'),
+                                _buildHeaderCell('Image'),
+                              ],
                             ),
                           ],
                         ),
@@ -148,20 +156,33 @@ class _HomeChildState extends State<HomeChild> {
                               children: List.generate(value.listData.length,
                                   (rowIndex) {
                                 return TableRow(children: [
-                                  _buildDataCell(
-                                      value.listData[rowIndex].itemCode),
+                                  _buildDataCell(value
+                                      .listData[rowIndex].itemCode
+                                      .toString()),
                                   _buildDataCell(
                                       value.listData[rowIndex].barCode),
-                                  _buildDataCell(value.listData[rowIndex].unit),
-                                  _buildDataCell(
-                                      value.listData[rowIndex].length),
-                                  _buildDataCell(
-                                      value.listData[rowIndex].width),
-                                  _buildDataCell(
-                                      value.listData[rowIndex].height),
-                                  _buildDataCell(
-                                      value.listData[rowIndex].weight),
-                                  Image.network(value.listData[rowIndex].image),
+                                  _buildDataCell(value
+                                      .listData[rowIndex].unitOfMeasure
+                                      .toString()),
+                                  _buildDataCell(value.listData[rowIndex].length
+                                      .toString()),
+                                  _buildDataCell(value.listData[rowIndex].width
+                                      .toString()),
+                                  _buildDataCell(value.listData[rowIndex].height
+                                      .toString()),
+                                  _buildDataCell(value.listData[rowIndex].weight
+                                      .toString()),
+                                  Row(
+                                    children: value.listData[rowIndex].images
+                                        .map((image) {
+                                      return Image.network(
+                                        image.url,
+                                        width: 100,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                      );
+                                    }).toList(),
+                                  ),
                                 ]);
                               }),
                             ),
@@ -170,10 +191,6 @@ class _HomeChildState extends State<HomeChild> {
                       ],
                     ),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: value.addRow,
-                  child: const Text('Thêm hàng'),
                 ),
               ],
             ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/model/data_model.dart';
 import 'package:flutter_scanner_app/model/enum.dart';
 import 'package:flutter_scanner_app/model/item_model.dart';
+import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/utils/assets.dart';
 import 'package:flutter_scanner_app/utils/unit_utils.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
@@ -14,7 +15,7 @@ class CreateItemProvider extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
   final ImagePicker picker = ImagePicker();
   final List<XFile> images = [];
-  final List<ItemModel> listData = [];
+  final List<ProductModel> listData = [];
 
   //controller
   final TextEditingController itemCodeController = TextEditingController();
@@ -37,15 +38,18 @@ class CreateItemProvider extends ChangeNotifier {
   String selectedHeightUnit = "";
   String selectedWeightUnit = "";
 
+  //mock data, will remove when have api
+  List<String> unitList = UnitModel.values.map((e) => e.name).toList();
+
   Future<void> init(BuildContext context) async {
     String data = await DefaultAssetBundle.of(context)
         .loadString('${AppAsset.assets}mock.json');
 
     final Map<String, dynamic> jsonResult = json.decode(data);
 
-    DataModel dataModel = DataModel.fromJson(jsonResult);
+    ResponseModel dataModel = ResponseModel.fromJson(jsonResult);
 
-    for (ItemModel e in dataModel.listData) {
+    for (ProductModel e in dataModel.products) {
       listData.add(e);
     }
 
@@ -108,6 +112,11 @@ class CreateItemProvider extends ChangeNotifier {
       barCodeController.text = handleScanResult(res, context);
       notifyListeners();
     }
+  }
+
+  void chooseUnit(String? value) {
+    unitController.text = value ?? "";
+    notifyListeners();
   }
 
   void chooseImageFromGallery(BuildContext context) async {

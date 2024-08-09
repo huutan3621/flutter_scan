@@ -1,28 +1,39 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/model/data_model.dart';
+import 'package:flutter_scanner_app/model/enum.dart';
 import 'package:flutter_scanner_app/model/item_model.dart';
+import 'package:flutter_scanner_app/model/product_model.dart';
+import 'package:flutter_scanner_app/screens/create_item_screen.dart';
+import 'package:flutter_scanner_app/service/api_service.dart';
 import 'package:flutter_scanner_app/utils/assets.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
 
 class HomeProvider extends ChangeNotifier {
+  final ApiService apiService = ApiService();
   late String scanResult = '';
   final TextEditingController textController = TextEditingController();
-  final List<ItemModel> listData = [];
+  final List<ProductModel> listData = [];
 
   Future<void> init(BuildContext context) async {
-    String data = await DefaultAssetBundle.of(context)
-        .loadString('${AppAsset.assets}mock.json');
+    try {
+      String data = await DefaultAssetBundle.of(context)
+          .loadString('${AppAsset.assets}mock_second.json');
 
-    final Map<String, dynamic> jsonResult = json.decode(data);
+      final Map<String, dynamic> jsonResult = json.decode(data);
 
-    DataModel dataModel = DataModel.fromJson(jsonResult);
+      ResponseModel dataModel = ResponseModel.fromJson(jsonResult);
 
-    for (ItemModel e in dataModel.listData) {
-      listData.add(e);
+      listData.addAll(dataModel.products);
+      notifyListeners();
+    } catch (e) {
+      // Handle JSON parsing errors or other issues here
+      print('Error loading data: $e');
     }
-    notifyListeners();
+
+    //get data
+    // final data = await apiService.fetchProducts();
+    // print("aaaaaaaa ${data.first.barCode}");
   }
 
   void handleScanResult(String result, BuildContext context) {
@@ -31,19 +42,47 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<List<String>> data = [
-    List.generate(8, (index) => 'Header $index'),
-    List.generate(8, (index) => 'Data $index'),
-  ];
-
-  void addRow() {
-    data.add(List.generate(8, (index) => 'New Data $index'));
-    notifyListeners();
-  }
-
   @override
   void dispose() {
-    super.dispose();
     textController.dispose();
+    super.dispose();
+  }
+
+  bool containsAllUnits() {
+    final unitsInList = listData.map((item) => item.unitOfMeasure).toSet();
+    final allUnits = UnitModel.values.map((e) => e.name).toSet();
+    return allUnits.difference(unitsInList).isEmpty;
+  }
+
+  List<String> getMissingUnits() {
+    final unitsInList = listData.map((item) => item.unitOfMeasure).toSet();
+    final allUnits = UnitModel.values.map((e) => e.name).toSet();
+    return allUnits.difference(unitsInList).toList();
+  }
+
+  void navigateToCreateScreen(BuildContext context) {
+    if (containsAllUnits()) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CreateItemScreen(),
+        ),
+      );
+    } else {
+      if (listData.isNotEmpty) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CreateItemScreen(productModel: listData[0]),
+          ),
+        );
+      } else {
+        // Handle the case where listData is empty
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('No items available to pass to CreateItemScreen.')),
+        );
+      }
+    }
   }
 }

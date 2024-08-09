@@ -1,36 +1,72 @@
 {
-   "id": "1",
-    "data": [
-   
-        {
-            "itemCode": "909870",
-            "barCode": "8935206026306",
-            "unit": "1",
-            "length": "1",
-            "width": "100",
-            "height": "1",
-            "weight": "1",
-            "image": "https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630"
-        },
-        {
-            "itemCode": "931684",
-            "barCode": "8935206026307",
-            "unit": "2",
-            "length": "2",
-            "width": "200",
-            "height": "2",
-            "weight": "2",
-            "image": "https://h5p.org/sites/default/files/h5p/content/1209180/images/file-6113d5f8845dc.jpeg"
-        },
-        {
-            "itemCode": "912347",
-            "barCode": "8935206026308",
-            "unit": "3",
-            "length": "3",
-            "width": "300",
-            "height": "3",
-            "weight": "3",
-            "image": "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-        }
+    "totalCount": 3,
+    "pageSize": 10,
+    "currentPage": 1,
+    "totalPages": 1,
+    "products": [
+      {
+        "itemCode": "909870",
+        "barCode": "8935206026306",
+        "unitOfMeasure": "THUNG",
+        "length": 1,
+        "width": 100,
+        "height": 1,
+        "weight": 1,
+        "createDate": "2024-08-09T08:48:34.897Z",
+        "createBy": "Hieuth",
+        "images": [
+          {
+            "imageId": 1,
+            "productId": 909870,
+            "type": "image/jpeg",
+            "name": "image1.jpg",
+            "size": "123456",
+            "url": "https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630"
+          }
+        ]
+      },
+      {
+        "itemCode": "931684",
+        "barCode": "8935206026307",
+        "unitOfMeasure": "HOP",
+        "length": 2,
+        "width": 200,
+        "height": 2,
+        "weight": 2,
+        "createDate": "2024-08-09T08:48:34.897Z",
+        "createBy": "Hieuth",
+        "images": [
+          {
+            "imageId": 2,
+            "productId": 931684,
+            "type": "image/jpeg",
+            "name": "image2.jpg",
+            "size": "654321",
+            "url": "https://h5p.org/sites/default/files/h5p/content/1209180/images/file-6113d5f8845dc.jpeg"
+          }
+        ]
+      },
+      {
+        "itemCode": "912347",
+        "barCode": "8935206026308",
+        "unitOfMeasure": "VI",
+        "length": 3,
+        "width": 300,
+        "height": 3,
+        "weight": 3,
+        "createDate": "2024-08-09T08:48:34.897Z",
+        "createBy": "Hieuth",
+        "images": [
+          {
+            "imageId": 3,
+            "productId": 912347,
+            "type": "image/jpeg",
+            "name": "image3.jpg",
+            "size": "789012",
+            "url": "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
+          }
+        ]
+      }
     ]
-}
+  }
+  
