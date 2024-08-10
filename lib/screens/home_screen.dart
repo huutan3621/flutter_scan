@@ -88,12 +88,6 @@ class _HomeChildState extends State<HomeChild> {
                       const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => const CreateItemScreen(),
-                          //   ),
-                          // );
                           value.navigateToCreateScreen(context);
                         },
                         child: const Text('Create'),
@@ -153,27 +147,27 @@ class _HomeChildState extends State<HomeChild> {
                                 6: FixedColumnWidth(100),
                                 7: FixedColumnWidth(100),
                               },
-                              children: List.generate(value.listData.length,
+                              children: List.generate(value.dataList.length,
                                   (rowIndex) {
                                 return TableRow(children: [
                                   _buildDataCell(value
-                                      .listData[rowIndex].itemCode
+                                      .dataList[rowIndex].itemCode
                                       .toString()),
                                   _buildDataCell(
-                                      value.listData[rowIndex].barCode),
+                                      value.dataList[rowIndex].barCode),
                                   _buildDataCell(value
-                                      .listData[rowIndex].unitOfMeasure
+                                      .dataList[rowIndex].unitOfMeasure
                                       .toString()),
-                                  _buildDataCell(value.listData[rowIndex].length
+                                  _buildDataCell(value.dataList[rowIndex].length
                                       .toString()),
-                                  _buildDataCell(value.listData[rowIndex].width
+                                  _buildDataCell(value.dataList[rowIndex].width
                                       .toString()),
-                                  _buildDataCell(value.listData[rowIndex].height
+                                  _buildDataCell(value.dataList[rowIndex].height
                                       .toString()),
-                                  _buildDataCell(value.listData[rowIndex].weight
+                                  _buildDataCell(value.dataList[rowIndex].weight
                                       .toString()),
                                   Row(
-                                    children: value.listData[rowIndex].images
+                                    children: value.dataList[rowIndex].images
                                         .map((image) {
                                       return Image.network(
                                         image.url,

@@ -13,32 +13,45 @@ class HomeProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
   late String scanResult = '';
   final TextEditingController textController = TextEditingController();
-  final List<ProductModel> listData = [];
+  late List<ProductModel> dataList = [];
+  late List<String> unitList = [];
 
   Future<void> init(BuildContext context) async {
-    try {
-      String data = await DefaultAssetBundle.of(context)
-          .loadString('${AppAsset.assets}mock_second.json');
+    // try {
+    //   String data = await DefaultAssetBundle.of(context)
+    //       .loadString('${AppAsset.assets}mock_second.json');
 
-      final Map<String, dynamic> jsonResult = json.decode(data);
+    //   final Map<String, dynamic> jsonResult = json.decode(data);
 
-      ResponseModel dataModel = ResponseModel.fromJson(jsonResult);
+    //   ResponseModel dataModel = ResponseModel.fromJson(jsonResult);
 
-      listData.addAll(dataModel.products);
-      notifyListeners();
-    } catch (e) {
-      // Handle JSON parsing errors or other issues here
-      print('Error loading data: $e');
-    }
+    //   listData.addAll(dataModel.products);
+    //   notifyListeners();
+    // } catch (e) {
+    //   // Handle JSON parsing errors or other issues here
+    //   print('Error loading data: $e');
+    // }
 
     //get data
     // final data = await apiService.fetchProducts();
     // print("aaaaaaaa ${data.first.barCode}");
   }
 
-  void handleScanResult(String result, BuildContext context) {
+  Future<void> handleScanResult(String result, BuildContext context) async {
     scanResult = Utils.handleTSScanResult(result, context);
     textController.text = scanResult;
+    notifyListeners();
+    await getProductsById(scanResult);
+    await getUnitById(scanResult);
+  }
+
+  Future<void> getProductsById(String itemNumber) async {
+    dataList = await apiService.getProductsById(itemNumber);
+    notifyListeners();
+  }
+
+  Future<void> getUnitById(String itemNumber) async {
+    unitList = await apiService.getUnitById(itemNumber);
     notifyListeners();
   }
 
@@ -49,13 +62,13 @@ class HomeProvider extends ChangeNotifier {
   }
 
   bool containsAllUnits() {
-    final unitsInList = listData.map((item) => item.unitOfMeasure).toSet();
+    final unitsInList = dataList.map((item) => item.unitOfMeasure).toSet();
     final allUnits = UnitModel.values.map((e) => e.name).toSet();
     return allUnits.difference(unitsInList).isEmpty;
   }
 
   List<String> getMissingUnits() {
-    final unitsInList = listData.map((item) => item.unitOfMeasure).toSet();
+    final unitsInList = dataList.map((item) => item.unitOfMeasure).toSet();
     final allUnits = UnitModel.values.map((e) => e.name).toSet();
     return allUnits.difference(unitsInList).toList();
   }
@@ -69,11 +82,11 @@ class HomeProvider extends ChangeNotifier {
         ),
       );
     } else {
-      if (listData.isNotEmpty) {
+      if (dataList.isNotEmpty) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CreateItemScreen(productModel: listData[0]),
+            builder: (context) => CreateItemScreen(productModel: dataList[0]),
           ),
         );
       } else {
