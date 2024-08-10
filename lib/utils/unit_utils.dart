@@ -2,7 +2,7 @@ import 'package:flutter_scanner_app/model/enum.dart';
 import 'package:collection/collection.dart';
 
 class UnitUtils {
-  static double convertUnit(double value, String unitInput, String unitOutput) {
+  static int convertUnit(int value, String unitInput, String unitOutput) {
     LengthUnitEnum unitInputEnum =
         LengthUnitEnum.values.firstWhereOrNull((e) => e.name == unitInput) ??
             LengthUnitEnum.mm;
@@ -21,8 +21,8 @@ class UnitUtils {
     }
   }
 
-  static double convertMToUnit(
-      double value, LengthUnitEnum unitInput, LengthUnitEnum unitOutput) {
+  static int convertMToUnit(
+      int value, LengthUnitEnum unitInput, LengthUnitEnum unitOutput) {
     switch (unitOutput) {
       case LengthUnitEnum.m:
         return value;
@@ -35,11 +35,11 @@ class UnitUtils {
     }
   }
 
-  static double convertDMToUnit(
-      double value, LengthUnitEnum unitInput, LengthUnitEnum unitOutput) {
+  static int convertDMToUnit(
+      int value, LengthUnitEnum unitInput, LengthUnitEnum unitOutput) {
     switch (unitOutput) {
       case LengthUnitEnum.m:
-        return value / 10;
+        return (value / 10).round();
       case LengthUnitEnum.dm:
         return value;
       case LengthUnitEnum.cm:
@@ -49,13 +49,13 @@ class UnitUtils {
     }
   }
 
-  static double convertCMToUnit(
-      double value, LengthUnitEnum unitInput, LengthUnitEnum unitOutput) {
+  static int convertCMToUnit(
+      int value, LengthUnitEnum unitInput, LengthUnitEnum unitOutput) {
     switch (unitOutput) {
       case LengthUnitEnum.m:
-        return value / 100;
+        return (value / 100).round();
       case LengthUnitEnum.dm:
-        return value / 10;
+        return (value / 10).round();
       case LengthUnitEnum.cm:
         return value;
       case LengthUnitEnum.mm:
@@ -63,23 +63,22 @@ class UnitUtils {
     }
   }
 
-  static double convertMMToUnit(
-      double value, LengthUnitEnum unitInput, LengthUnitEnum unitOutput) {
+  static int convertMMToUnit(
+      int value, LengthUnitEnum unitInput, LengthUnitEnum unitOutput) {
     switch (unitOutput) {
       case LengthUnitEnum.m:
-        return value / 1000;
+        return (value / 1000).round();
       case LengthUnitEnum.dm:
-        return value / 100;
+        return (value / 100).round();
       case LengthUnitEnum.cm:
-        return value / 10;
+        return (value / 10).round();
       case LengthUnitEnum.mm:
         return value;
     }
   }
 
   //weight
-  static double convertWeightUnit(
-      double value, String unitInput, String unitOutput) {
+  static int convertWeightUnit(int value, String unitInput, String unitOutput) {
     WeightUnitEnum unitInputEnum =
         WeightUnitEnum.values.firstWhereOrNull((e) => e.name == unitInput) ??
             WeightUnitEnum.g;
@@ -94,8 +93,8 @@ class UnitUtils {
     }
   }
 
-  static double convertKgToUnit(
-      double value, WeightUnitEnum unitInput, WeightUnitEnum unitOutput) {
+  static int convertKgToUnit(
+      int value, WeightUnitEnum unitInput, WeightUnitEnum unitOutput) {
     switch (unitOutput) {
       case WeightUnitEnum.kg:
         return value;
@@ -104,11 +103,11 @@ class UnitUtils {
     }
   }
 
-  static double convertGToUnit(
-      double value, WeightUnitEnum unitInput, WeightUnitEnum unitOutput) {
+  static int convertGToUnit(
+      int value, WeightUnitEnum unitInput, WeightUnitEnum unitOutput) {
     switch (unitOutput) {
       case WeightUnitEnum.kg:
-        return value / 1000;
+        return (value / 1000).round();
       case WeightUnitEnum.g:
         return value;
     }

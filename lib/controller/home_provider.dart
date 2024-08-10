@@ -16,26 +16,7 @@ class HomeProvider extends ChangeNotifier {
   late List<ProductModel> dataList = [];
   late List<String> unitList = [];
 
-  Future<void> init(BuildContext context) async {
-    // try {
-    //   String data = await DefaultAssetBundle.of(context)
-    //       .loadString('${AppAsset.assets}mock_second.json');
-
-    //   final Map<String, dynamic> jsonResult = json.decode(data);
-
-    //   ResponseModel dataModel = ResponseModel.fromJson(jsonResult);
-
-    //   listData.addAll(dataModel.products);
-    //   notifyListeners();
-    // } catch (e) {
-    //   // Handle JSON parsing errors or other issues here
-    //   print('Error loading data: $e');
-    // }
-
-    //get data
-    // final data = await apiService.fetchProducts();
-    // print("aaaaaaaa ${data.first.barCode}");
-  }
+  Future<void> init(BuildContext context) async {}
 
   Future<void> handleScanResult(String result, BuildContext context) async {
     scanResult = Utils.handleTSScanResult(result, context);
@@ -63,32 +44,39 @@ class HomeProvider extends ChangeNotifier {
 
   bool containsAllUnits() {
     final unitsInList = dataList.map((item) => item.unitOfMeasure).toSet();
-    final allUnits = UnitModel.values.map((e) => e.name).toSet();
+    final allUnits = unitList.toSet();
     return allUnits.difference(unitsInList).isEmpty;
   }
 
   List<String> getMissingUnits() {
     final unitsInList = dataList.map((item) => item.unitOfMeasure).toSet();
-    final allUnits = UnitModel.values.map((e) => e.name).toSet();
+    final allUnits = unitList.toSet();
     return allUnits.difference(unitsInList).toList();
   }
 
   void navigateToCreateScreen(BuildContext context) {
-    if (containsAllUnits()) {
+    if (containsAllUnits() == true) {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => const CreateItemScreen(),
         ),
       );
+      print("object");
     } else {
       if (dataList.isNotEmpty) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CreateItemScreen(productModel: dataList[0]),
+            builder: (context) => CreateItemScreen(
+              productModel: dataList[0].copyWith(
+                unitOfMeasure: getMissingUnits().first,
+              ),
+              unitList: unitList,
+            ),
           ),
         );
+        print("object222");
       } else {
         // Handle the case where listData is empty
         ScaffoldMessenger.of(context).showSnackBar(

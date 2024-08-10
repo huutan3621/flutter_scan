@@ -35,7 +35,7 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
   void initState() {
     super.initState();
     list = widget.unitList ?? [];
-    dropdownValue = list.isNotEmpty ? list.first : '';
+    dropdownValue = list.isNotEmpty ? list.last : '';
   }
 
   @override

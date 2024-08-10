@@ -34,10 +34,12 @@ ProductModel _$ProductModelFromJson(Map<String, dynamic> json) => ProductModel(
       width: (json['width'] as num).toInt(),
       height: (json['height'] as num).toInt(),
       weight: (json['weight'] as num).toInt(),
-      createDate: DateTime.parse(json['createDate'] as String),
+      createDate: json['createDate'] == null
+          ? null
+          : DateTime.parse(json['createDate'] as String),
       createBy: json['createBy'] as String,
-      images: (json['images'] as List<dynamic>)
-          .map((e) => ImageModel.fromJson(e as Map<String, dynamic>))
+      images: (json['images'] as List<dynamic>?)
+          ?.map((e) => ImageModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
@@ -50,7 +52,7 @@ Map<String, dynamic> _$ProductModelToJson(ProductModel instance) =>
       'width': instance.width,
       'height': instance.height,
       'weight': instance.weight,
-      'createDate': instance.createDate.toIso8601String(),
+      'createDate': instance.createDate?.toIso8601String(),
       'createBy': instance.createBy,
       'images': instance.images,
     };

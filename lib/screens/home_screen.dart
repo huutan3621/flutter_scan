@@ -167,7 +167,7 @@ class _HomeChildState extends State<HomeChild> {
                                   _buildDataCell(value.dataList[rowIndex].weight
                                       .toString()),
                                   Row(
-                                    children: value.dataList[rowIndex].images
+                                    children: value.dataList[rowIndex].images!
                                         .map((image) {
                                       return Image.network(
                                         image.url,

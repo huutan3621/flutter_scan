@@ -61,11 +61,15 @@ class ProductModel {
   @JsonKey(name: "weight")
   final int weight;
   @JsonKey(name: "createDate")
-  final DateTime createDate;
+  final DateTime? createDate;
   @JsonKey(name: "createBy")
   final String createBy;
   @JsonKey(name: "images")
-  final List<ImageModel> images;
+  final List<ImageModel>? images;
+  @JsonKey(name: "productId")
+  final int? productId;
+  @JsonKey(name: "block")
+  final bool? block;
 
   ProductModel({
     required this.itemCode,
@@ -75,9 +79,11 @@ class ProductModel {
     required this.width,
     required this.height,
     required this.weight,
-    required this.createDate,
+    this.createDate,
     required this.createBy,
-    required this.images,
+    this.images,
+    this.productId,
+    this.block,
   });
 
   ProductModel copyWith({
@@ -91,6 +97,8 @@ class ProductModel {
     DateTime? createDate,
     String? createBy,
     List<ImageModel>? images,
+    int? productId,
+    bool? block,
   }) =>
       ProductModel(
         itemCode: itemCode ?? this.itemCode,
@@ -103,6 +111,8 @@ class ProductModel {
         createDate: createDate ?? this.createDate,
         createBy: createBy ?? this.createBy,
         images: images ?? this.images,
+        productId: productId ?? this.productId,
+        block: block ?? this.block,
       );
 
   factory ProductModel.fromJson(Map<String, dynamic> json) =>

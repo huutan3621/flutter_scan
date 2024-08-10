@@ -9,7 +9,8 @@ import 'package:provider/provider.dart';
 
 class CreateItemScreen extends StatelessWidget {
   final ProductModel? productModel;
-  const CreateItemScreen({super.key, this.productModel});
+  final List<String>? unitList;
+  const CreateItemScreen({super.key, this.productModel, this.unitList});
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +18,7 @@ class CreateItemScreen extends StatelessWidget {
       create: (context) => CreateItemProvider(),
       child: CreateItemChild(
         productModel: productModel,
+        unitList: unitList,
       ),
     );
   }
@@ -24,7 +26,9 @@ class CreateItemScreen extends StatelessWidget {
 
 class CreateItemChild extends StatefulWidget {
   final ProductModel? productModel;
-  const CreateItemChild({super.key, this.productModel});
+  final List<String>? unitList;
+
+  const CreateItemChild({super.key, this.productModel, this.unitList});
 
   @override
   _CreateItemChildState createState() => _CreateItemChildState();
@@ -36,7 +40,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       var homeProvider =
           Provider.of<CreateItemProvider>(context, listen: false);
-      homeProvider.init(context);
+      homeProvider.init(widget.productModel, widget.unitList);
     });
     super.initState();
   }
@@ -81,7 +85,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                     //     enabled: false,
                     //     decoration: const InputDecoration(labelText: 'Unit')),
                     DropdownMenu<String>(
-                      initialSelection: value.unitList.first,
+                      initialSelection: value.unitController.text,
                       controller: value.unitController,
                       requestFocusOnTap: false,
                       label: const Text('Unit'),
@@ -122,6 +126,18 @@ class _CreateItemChildState extends State<CreateItemChild> {
                     ),
                     //height
                     SelectUnitTextFormField(
+                      controller: value.heightController,
+                      label: "Height",
+                      unit: value.selectedHeightUnit,
+                      callback: (previousValue, currentValue) {
+                        // setState(() {});
+                        value.updateSelectedHeightUnit(
+                            previousValue, currentValue);
+                      },
+                      unitList: value.lengthUnit,
+                    ),
+                    //weight
+                    SelectUnitTextFormField(
                       controller: value.weightController,
                       label: "Weight",
                       unit: value.selectedWeightUnit,
@@ -156,9 +172,10 @@ class _CreateItemChildState extends State<CreateItemChild> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () async {
-                        if (value.formKey.currentState!.validate()) {
-                          // Handle form submission
-                        }
+                        // if (value.formKey.currentState!.validate()) {
+                        //   // Handle form submission
+                        // }
+                        value.createItem();
                       },
                       child: const Text('Submit'),
                     ),
