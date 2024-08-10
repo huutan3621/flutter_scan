@@ -167,6 +167,7 @@ class CreateItemProvider extends ChangeNotifier {
         );
       }
     }
+    Navigator.pop(context);
   }
 
   void chooseImageFromCamera(BuildContext context) async {
@@ -198,6 +199,7 @@ class CreateItemProvider extends ChangeNotifier {
         );
       }
     }
+    Navigator.pop(context);
   }
 
   Future<void> createItem() async {

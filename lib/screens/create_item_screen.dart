@@ -214,8 +214,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
               value.chooseImageFromCamera(context);
             },
             style: ElevatedButton.styleFrom(
-              minimumSize: const Size(
-                  double.infinity, 36), // Expands button width to full width
+              minimumSize: const Size(double.infinity, 36),
             ),
             child: const Text('Camera'),
           ),

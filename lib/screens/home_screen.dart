@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/controller/home_provider.dart';
-
+import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/screens/create_item_screen.dart';
-
 import 'package:provider/provider.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
@@ -26,7 +25,7 @@ class HomeChild extends StatefulWidget {
 }
 
 class _HomeChildState extends State<HomeChild> {
-//init
+  // Initialize the provider
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -55,7 +54,7 @@ class _HomeChildState extends State<HomeChild> {
             scrollDirection: Axis.vertical,
             child: Column(
               children: [
-                //btn field
+                // Button field
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -77,7 +76,7 @@ class _HomeChildState extends State<HomeChild> {
                           child: TextField(
                             enabled: false,
                             controller:
-                                value.textController, //display result here
+                                value.textController, // Display result here
                             decoration: const InputDecoration(
                                 hintText: 'Scan item...',
                                 border: OutlineInputBorder(),
@@ -113,7 +112,7 @@ class _HomeChildState extends State<HomeChild> {
                             4: FixedColumnWidth(100),
                             5: FixedColumnWidth(100),
                             6: FixedColumnWidth(100),
-                            7: FixedColumnWidth(100),
+                            7: FixedColumnWidth(150),
                           },
                           children: [
                             TableRow(
@@ -145,10 +144,15 @@ class _HomeChildState extends State<HomeChild> {
                                 4: FixedColumnWidth(100),
                                 5: FixedColumnWidth(100),
                                 6: FixedColumnWidth(100),
-                                7: FixedColumnWidth(100),
+                                7: FixedColumnWidth(150),
                               },
                               children: List.generate(value.dataList.length,
                                   (rowIndex) {
+                                final List<ImageViewModel> images =
+                                    value.dataList[rowIndex].images ?? [];
+
+                                final hasMoreImages = images.length > 1;
+
                                 return TableRow(children: [
                                   _buildDataCell(value
                                       .dataList[rowIndex].itemCode
@@ -166,16 +170,45 @@ class _HomeChildState extends State<HomeChild> {
                                       .toString()),
                                   _buildDataCell(value.dataList[rowIndex].weight
                                       .toString()),
-                                  Row(
-                                    children: value.dataList[rowIndex].images!
-                                        .map((image) {
-                                      return Image.network(
-                                        image.url,
-                                        width: 100,
-                                        height: 100,
-                                        fit: BoxFit.cover,
-                                      );
-                                    }).toList(),
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (images.isNotEmpty) {
+                                        value.showImagePreviewDialog(
+                                            context, images);
+                                      }
+                                    },
+                                    child: Row(
+                                      children: [
+                                        if (images.isNotEmpty)
+                                          Flexible(
+                                            child: AspectRatio(
+                                              aspectRatio: 1,
+                                              child: Container(
+                                                margin: const EdgeInsets.only(
+                                                    right: 8.0),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  child: Image.network(
+                                                    images[0].url ?? "",
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        if (hasMoreImages)
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            child: Text(
+                                              '+${images.length - 1} more',
+                                              style:
+                                                  const TextStyle(fontSize: 16),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
                                   ),
                                 ]);
                               }),
@@ -208,13 +241,16 @@ class _HomeChildState extends State<HomeChild> {
   }
 
   Widget _buildDataCell(String text) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      child: Center(
-        child: Text(
-          text,
-          style: const TextStyle(fontSize: 16),
-          textAlign: TextAlign.center,
+    return GestureDetector(
+      onTap: null, // No action for text cells
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );

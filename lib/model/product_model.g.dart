@@ -39,7 +39,7 @@ ProductModel _$ProductModelFromJson(Map<String, dynamic> json) => ProductModel(
           : DateTime.parse(json['createDate'] as String),
       createBy: json['createBy'] as String,
       images: (json['images'] as List<dynamic>?)
-          ?.map((e) => ImageModel.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => ImageViewModel.fromJson(e as Map<String, dynamic>))
           .toList(),
       productId: (json['productId'] as num?)?.toInt(),
       block: json['block'] as bool?,
@@ -61,16 +61,17 @@ Map<String, dynamic> _$ProductModelToJson(ProductModel instance) =>
       'block': instance.block,
     };
 
-ImageModel _$ImageModelFromJson(Map<String, dynamic> json) => ImageModel(
-      imageId: (json['imageId'] as num).toInt(),
-      productId: (json['productId'] as num).toInt(),
-      type: json['type'] as String,
-      name: json['name'] as String,
-      size: json['size'] as String,
-      url: json['url'] as String,
+ImageViewModel _$ImageViewModelFromJson(Map<String, dynamic> json) =>
+    ImageViewModel(
+      imageId: (json['imageId'] as num?)?.toInt(),
+      productId: (json['productId'] as num?)?.toInt(),
+      type: json['type'] as String?,
+      name: json['name'] as String?,
+      size: json['size'] as String?,
+      url: json['url'] as String?,
     );
 
-Map<String, dynamic> _$ImageModelToJson(ImageModel instance) =>
+Map<String, dynamic> _$ImageViewModelToJson(ImageViewModel instance) =>
     <String, dynamic>{
       'imageId': instance.imageId,
       'productId': instance.productId,

@@ -65,7 +65,7 @@ class ProductModel {
   @JsonKey(name: "createBy")
   final String createBy;
   @JsonKey(name: "images")
-  final List<ImageModel>? images;
+  final List<ImageViewModel>? images;
   @JsonKey(name: "productId")
   final int? productId;
   @JsonKey(name: "block")
@@ -96,7 +96,7 @@ class ProductModel {
     int? weight,
     DateTime? createDate,
     String? createBy,
-    List<ImageModel>? images,
+    List<ImageViewModel>? images,
     int? productId,
     bool? block,
   }) =>
@@ -122,30 +122,30 @@ class ProductModel {
 }
 
 @JsonSerializable()
-class ImageModel {
+class ImageViewModel {
   @JsonKey(name: "imageId")
-  final int imageId;
+  final int? imageId;
   @JsonKey(name: "productId")
-  final int productId;
+  final int? productId;
   @JsonKey(name: "type")
-  final String type;
+  final String? type;
   @JsonKey(name: "name")
-  final String name;
+  final String? name;
   @JsonKey(name: "size")
-  final String size;
+  final String? size;
   @JsonKey(name: "url")
-  final String url;
+  final String? url;
 
-  ImageModel({
-    required this.imageId,
-    required this.productId,
-    required this.type,
-    required this.name,
-    required this.size,
-    required this.url,
+  ImageViewModel({
+    this.imageId,
+    this.productId,
+    this.type,
+    this.name,
+    this.size,
+    this.url,
   });
 
-  ImageModel copyWith({
+  ImageViewModel copyWith({
     int? imageId,
     int? productId,
     String? type,
@@ -153,7 +153,7 @@ class ImageModel {
     String? size,
     String? url,
   }) =>
-      ImageModel(
+      ImageViewModel(
         imageId: imageId ?? this.imageId,
         productId: productId ?? this.productId,
         type: type ?? this.type,
@@ -162,8 +162,8 @@ class ImageModel {
         url: url ?? this.url,
       );
 
-  factory ImageModel.fromJson(Map<String, dynamic> json) =>
-      _$ImageModelFromJson(json);
+  factory ImageViewModel.fromJson(Map<String, dynamic> json) =>
+      _$ImageViewModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ImageModelToJson(this);
+  Map<String, dynamic> toJson() => _$ImageViewModelToJson(this);
 }

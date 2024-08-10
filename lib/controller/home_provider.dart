@@ -1,13 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_scanner_app/model/data_model.dart';
-import 'package:flutter_scanner_app/model/enum.dart';
-import 'package:flutter_scanner_app/model/item_model.dart';
+
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/screens/create_item_screen.dart';
 import 'package:flutter_scanner_app/service/api_service.dart';
-import 'package:flutter_scanner_app/utils/assets.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
+
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 
 class HomeProvider extends ChangeNotifier {
@@ -20,10 +17,10 @@ class HomeProvider extends ChangeNotifier {
   Future<void> init(BuildContext context) async {}
 
   Future<void> handleScanResult(String result, BuildContext context) async {
-    // scanResult = Utils.handleTSScanResult(result, context);
-    // textController.text = scanResult;
-    // notifyListeners();
-    scanResult = "900504";
+    scanResult = Utils.handleTSScanResult(result, context);
+    textController.text = scanResult;
+    notifyListeners();
+    // scanResult = "900504";
     await getProductsById(scanResult);
     await getUnitById(scanResult);
   }
@@ -115,10 +112,9 @@ class HomeProvider extends ChangeNotifier {
           MaterialPageRoute(
             builder: (context) => CreateItemScreen(
               productModel: ProductModel(
-                itemCode: scanResult, // Giả sử bạn có scanResult là mã sản phẩm
+                itemCode: scanResult,
                 barCode: '',
-                unitOfMeasure: unitList
-                    .first, // Chọn đơn vị đo lường đầu tiên trong unitList
+                unitOfMeasure: unitList.first,
                 length: 0,
                 width: 0,
                 height: 0,
@@ -161,5 +157,73 @@ class HomeProvider extends ChangeNotifier {
         response: null,
       );
     }
+  }
+
+  void showImagePreviewDialog(
+      BuildContext context, List<ImageViewModel> images) {
+    final PageController pageController = PageController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: Column(
+              children: [
+                // Large image view
+                Expanded(
+                  flex: 3,
+                  child: PageView.builder(
+                    controller: pageController,
+                    itemCount: images.length,
+                    itemBuilder: (context, index) {
+                      return Image.network(
+                        images[index].url ?? "",
+                        fit: BoxFit.cover,
+                      );
+                    },
+                    onPageChanged: (index) {
+                      pageController.jumpToPage(index);
+                    },
+                  ),
+                ),
+                // Small image preview list
+                SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: images.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          pageController.jumpToPage(index);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Image.network(
+                            images[index].url ?? "",
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                            scale: pageController.page == index ? 1.1 : 1.0,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
