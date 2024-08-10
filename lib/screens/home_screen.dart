@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/controller/home_provider.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
-import 'package:flutter_scanner_app/screens/create_item_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 

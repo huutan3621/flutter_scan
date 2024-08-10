@@ -1,20 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_scanner_app/model/data_model.dart';
 import 'package:flutter_scanner_app/model/enum.dart';
-import 'package:flutter_scanner_app/model/item_model.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/service/api_service.dart';
-import 'package:flutter_scanner_app/utils/assets.dart';
 import 'package:flutter_scanner_app/utils/unit_utils.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
-import 'dart:io'; // For File
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart'; // For MediaType
 
 class CreateItemProvider extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();

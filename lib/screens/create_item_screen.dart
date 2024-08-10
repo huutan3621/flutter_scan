@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/controller/create_item_provider.dart';
-import 'package:flutter_scanner_app/model/item_model.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/widgets/custom_textform_field.dart';
 import 'package:provider/provider.dart';
