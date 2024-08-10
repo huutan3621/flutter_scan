@@ -21,10 +21,9 @@ class CreateItemProvider extends ChangeNotifier {
   final List<XFile> images = [];
   final List<ProductModel> listData = [];
 
-  //
   final ApiService apiService = ApiService();
 
-  //controller
+  //controllers
   final TextEditingController itemCodeController = TextEditingController();
   final TextEditingController barCodeController = TextEditingController();
   final TextEditingController unitController = TextEditingController();
@@ -92,7 +91,7 @@ class CreateItemProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> scanItemCode(context) async {
+  Future<void> scanItemCode(BuildContext context) async {
     var res = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -105,7 +104,7 @@ class CreateItemProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> scanBarCode(context) async {
+  Future<void> scanBarCode(BuildContext context) async {
     var res = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -125,8 +124,10 @@ class CreateItemProvider extends ChangeNotifier {
 
   void chooseImageFromGallery(BuildContext context) async {
     if (images.length >= 5) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Maximum 5 images allowed')),
+      _showDialog(
+        context,
+        'Maximum Limit Reached',
+        'Maximum 5 images allowed',
       );
       return;
     }
@@ -145,8 +146,10 @@ class CreateItemProvider extends ChangeNotifier {
         images.add(pickedFile);
         notifyListeners();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Image size must be less than 2MB')),
+        _showDialog(
+          context,
+          'Image Size Error',
+          'Image size must be less than 2MB',
         );
       }
     }
@@ -154,8 +157,10 @@ class CreateItemProvider extends ChangeNotifier {
 
   void chooseImageFromCamera(BuildContext context) async {
     if (images.length >= 5) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Maximum 5 images allowed')),
+      _showDialog(
+        context,
+        'Maximum Limit Reached',
+        'Maximum 5 images allowed',
       );
       return;
     }
@@ -174,31 +179,51 @@ class CreateItemProvider extends ChangeNotifier {
         images.add(pickedFile);
         notifyListeners();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Image size must be less than 2MB')),
+        _showDialog(
+          context,
+          'Image Size Error',
+          'Image size must be less than 2MB',
         );
       }
     }
   }
 
   Future<void> createItem() async {
-    // ProductModel body = ProductModel(
-    //   itemCode: itemCodeController.text,
-    //   barCode: barCodeController.text,
-    //   unitOfMeasure: unitController.text,
-    //   length: int.parse(lengthController.text),
-    //   width: int.parse(widthController.text),
-    //   weight: int.parse(weightController.text),
-    //   height: int.parse(heightController.text),
-    //   createBy: "User",
-    // );
-    // final response = await apiService.createItem(body);
-    // print(body);
-    uploadImage(15);
+    ProductModel body = ProductModel(
+      itemCode: itemCodeController.text,
+      barCode: barCodeController.text,
+      unitOfMeasure: unitController.text,
+      length: int.parse(lengthController.text),
+      width: int.parse(widthController.text),
+      weight: int.parse(weightController.text),
+      height: int.parse(heightController.text),
+      createBy: "User",
+    );
+    final response = await apiService.createItem(body);
+    print(body);
+    uploadImage(response.productId ?? 0);
   }
 
   Future<void> uploadImage(int productId) async {
     final response = apiService.updateProductImage(productId, images);
     print(response);
+  }
+
+  void _showDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

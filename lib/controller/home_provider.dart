@@ -22,6 +22,7 @@ class HomeProvider extends ChangeNotifier {
     scanResult = Utils.handleTSScanResult(result, context);
     textController.text = scanResult;
     notifyListeners();
+    // scanResult = "909870";
     await getProductsById(scanResult);
     await getUnitById(scanResult);
   }
@@ -55,11 +56,14 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void navigateToCreateScreen(BuildContext context) {
-    if (containsAllUnits() == true) {
+    if (containsAllUnits()) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const CreateItemScreen(),
+          builder: (context) => CreateItemScreen(
+            productModel: dataList[0],
+            unitList: unitList,
+          ),
         ),
       );
       print("object");
@@ -78,10 +82,24 @@ class HomeProvider extends ChangeNotifier {
         );
         print("object222");
       } else {
-        // Handle the case where listData is empty
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('No items available to pass to CreateItemScreen.')),
+        // Replace SnackBar with AlertDialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('No Items Available'),
+              content:
+                  const Text('No items available to pass to CreateItemScreen.'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
         );
       }
     }
