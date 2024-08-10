@@ -41,6 +41,8 @@ ProductModel _$ProductModelFromJson(Map<String, dynamic> json) => ProductModel(
       images: (json['images'] as List<dynamic>?)
           ?.map((e) => ImageModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      productId: (json['productId'] as num?)?.toInt(),
+      block: json['block'] as bool?,
     );
 
 Map<String, dynamic> _$ProductModelToJson(ProductModel instance) =>
@@ -55,6 +57,8 @@ Map<String, dynamic> _$ProductModelToJson(ProductModel instance) =>
       'createDate': instance.createDate?.toIso8601String(),
       'createBy': instance.createBy,
       'images': instance.images,
+      'productId': instance.productId,
+      'block': instance.block,
     };
 
 ImageModel _$ImageModelFromJson(Map<String, dynamic> json) => ImageModel(

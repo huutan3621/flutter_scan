@@ -85,7 +85,9 @@ class _CreateItemChildState extends State<CreateItemChild> {
                     //     enabled: false,
                     //     decoration: const InputDecoration(labelText: 'Unit')),
                     DropdownMenu<String>(
-                      initialSelection: value.unitController.text,
+                      initialSelection: value.unitController.text.isEmpty
+                          ? null
+                          : value.unitController.text,
                       controller: value.unitController,
                       requestFocusOnTap: false,
                       label: const Text('Unit'),
@@ -101,6 +103,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         );
                       }).toList(),
                     ),
+
                     //length
                     SelectUnitTextFormField(
                       controller: value.lengthController,

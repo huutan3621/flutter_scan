@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_scanner_app/main.dart';
+import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -138,6 +139,7 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
+        _handleSuccessDialog("Upload image successfully");
         return true;
       } else {
         debugPrint(
@@ -154,28 +156,27 @@ class ApiService {
     }
   }
 
+  void _handleSuccessDialog(String message) {
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      DialogHelper.showSuccessDialog(
+        context: context,
+        message: message,
+      );
+    } else {
+      debugPrint('Error: Unable to show dialog because context is null.');
+    }
+  }
+
   void _handleDioError(DioException e) {
     debugPrint('Dio error: ${e.message}');
     final context = navigatorKey.currentContext;
     if (context != null) {
-      showDialog(
+      DialogHelper.showErrorDialog(
         context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: Text('Failed with status code: ${e.response?.statusCode}\n'
-                'Message: ${e.message}\n'
-                'Response: ${e.response?.data}'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
+        statusCode: e.response?.statusCode,
+        message: e.message ?? 'Unknown error occurred',
+        response: e.response?.data,
       );
     } else {
       debugPrint('Error: Unable to show dialog because context is null.');

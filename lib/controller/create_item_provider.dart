@@ -9,6 +9,7 @@ import 'package:flutter_scanner_app/service/api_service.dart';
 import 'package:flutter_scanner_app/utils/assets.dart';
 import 'package:flutter_scanner_app/utils/unit_utils.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
+import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'dart:io'; // For File
@@ -47,12 +48,11 @@ class CreateItemProvider extends ChangeNotifier {
   List<String> unitList = [];
 
   Future<void> init(ProductModel? productModel, List<String>? unitList) async {
-    //selected
     itemCodeController.text = productModel?.itemCode ?? "";
     barCodeController.text = productModel?.barCode ?? "";
     unitController.text = productModel?.unitOfMeasure ?? "";
-    unitList = unitList ?? [];
-    notifyListeners();
+    this.unitList = unitList ?? [];
+    notifyListeners(); // Notify listeners to update the UI
   }
 
   String handleScanResult(String result, BuildContext context) {
@@ -92,6 +92,14 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   Future<void> scanItemCode(BuildContext context) async {
+    if (itemCodeController.text.isNotEmpty) {
+      _showDialog(
+        context,
+        'Item Code is already set. Scanning is not allowed.',
+      );
+      return;
+    }
+
     var res = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -105,6 +113,14 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   Future<void> scanBarCode(BuildContext context) async {
+    if (barCodeController.text.isNotEmpty) {
+      _showDialog(
+        context,
+        'Barcode is already set. Scanning is not allowed.',
+      );
+      return;
+    }
+
     var res = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -126,7 +142,6 @@ class CreateItemProvider extends ChangeNotifier {
     if (images.length >= 5) {
       _showDialog(
         context,
-        'Maximum Limit Reached',
         'Maximum 5 images allowed',
       );
       return;
@@ -148,7 +163,6 @@ class CreateItemProvider extends ChangeNotifier {
       } else {
         _showDialog(
           context,
-          'Image Size Error',
           'Image size must be less than 2MB',
         );
       }
@@ -159,7 +173,6 @@ class CreateItemProvider extends ChangeNotifier {
     if (images.length >= 5) {
       _showDialog(
         context,
-        'Maximum Limit Reached',
         'Maximum 5 images allowed',
       );
       return;
@@ -181,7 +194,6 @@ class CreateItemProvider extends ChangeNotifier {
       } else {
         _showDialog(
           context,
-          'Image Size Error',
           'Image size must be less than 2MB',
         );
       }
@@ -200,8 +212,9 @@ class CreateItemProvider extends ChangeNotifier {
       createBy: "User",
     );
     final response = await apiService.createItem(body);
-    print(body);
+    print("aaa ${response.productId}");
     uploadImage(response.productId ?? 0);
+    // uploadImage(21);
   }
 
   Future<void> uploadImage(int productId) async {
@@ -209,21 +222,10 @@ class CreateItemProvider extends ChangeNotifier {
     print(response);
   }
 
-  void _showDialog(BuildContext context, String title, String message) {
-    showDialog(
+  void _showDialog(BuildContext context, String message) {
+    DialogHelper.showSuccessDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('OK'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
+      message: message,
     );
   }
 }
