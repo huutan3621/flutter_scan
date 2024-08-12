@@ -63,8 +63,8 @@ class _HomeChildState extends State<HomeChild> {
                           keyboardType: TextInputType.none,
                           readOnly: true,
                           decoration: const InputDecoration(
-                            labelText: 'Barcode',
-                            hintText: 'Scan item...',
+                            labelText: 'SKU',
+                            hintText: 'SKU',
                             border: OutlineInputBorder(),
                             suffixIcon: Icon(Icons.qr_code),
                           ),
@@ -95,6 +95,7 @@ class _HomeChildState extends State<HomeChild> {
                 ),
                 Container(
                   color: Colors.orange,
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Column(
@@ -117,10 +118,10 @@ class _HomeChildState extends State<HomeChild> {
                                 _buildHeaderCell('Item Code'),
                                 _buildHeaderCell('Bar Code'),
                                 _buildHeaderCell('Unit'),
-                                _buildHeaderCell('Length'),
-                                _buildHeaderCell('Width'),
-                                _buildHeaderCell('Height'),
-                                _buildHeaderCell('Weight'),
+                                _buildHeaderCell('Length (mm)'),
+                                _buildHeaderCell('Width (mm)'),
+                                _buildHeaderCell('Height (mm)'),
+                                _buildHeaderCell('Weight (mg)'),
                                 _buildHeaderCell('Image'),
                               ],
                             ),
@@ -145,7 +146,7 @@ class _HomeChildState extends State<HomeChild> {
                                                 size: 24, color: Colors.red),
                                             SizedBox(width: 8),
                                             Text(
-                                              "Không có giá trị",
+                                              "Empty",
                                               style: TextStyle(fontSize: 16),
                                             ),
                                           ],
@@ -212,7 +213,7 @@ class _HomeChildState extends State<HomeChild> {
                                               if (images.isNotEmpty)
                                                 Flexible(
                                                   child: AspectRatio(
-                                                    aspectRatio: 1,
+                                                    aspectRatio: 1.25,
                                                     child: Container(
                                                       margin:
                                                           const EdgeInsets.only(

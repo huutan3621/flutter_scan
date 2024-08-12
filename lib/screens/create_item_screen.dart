@@ -7,16 +7,19 @@ import 'package:flutter_scanner_app/widgets/custom_textform_field.dart';
 import 'package:provider/provider.dart';
 
 class CreateItemScreen extends StatelessWidget {
-  final ProductModel? productModel;
+  final ProductModel? product;
+  final String? itemCode;
   final List<String>? unitList;
-  const CreateItemScreen({super.key, this.productModel, this.unitList});
+  const CreateItemScreen(
+      {super.key, this.itemCode, this.product, this.unitList});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => CreateItemProvider(),
       child: CreateItemChild(
-        productModel: productModel,
+        itemCode: itemCode,
+        product: product,
         unitList: unitList,
       ),
     );
@@ -24,10 +27,11 @@ class CreateItemScreen extends StatelessWidget {
 }
 
 class CreateItemChild extends StatefulWidget {
-  final ProductModel? productModel;
+  final String? itemCode;
+  final ProductModel? product;
   final List<String>? unitList;
-
-  const CreateItemChild({super.key, this.productModel, this.unitList});
+  const CreateItemChild(
+      {super.key, this.itemCode, this.product, this.unitList});
 
   @override
   _CreateItemChildState createState() => _CreateItemChildState();
@@ -39,7 +43,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       var homeProvider =
           Provider.of<CreateItemProvider>(context, listen: false);
-      homeProvider.init(widget.productModel, widget.unitList);
+      homeProvider.init(widget.itemCode, widget.product, widget.unitList);
     });
     super.initState();
   }
@@ -61,11 +65,11 @@ class _CreateItemChildState extends State<CreateItemChild> {
                   children: [
                     TextFormField(
                       controller: value.itemCodeController,
-                      enabled: false,
+                      enabled: value.isItemCodeScanEnabled,
                       readOnly: true,
                       decoration: const InputDecoration(labelText: 'Item Code'),
                       onTap: () {
-                        // value.scanItemCode(context);
+                        value.scanItemCode(context);
                       },
                       onChanged: (value) {},
                     ),
@@ -87,24 +91,27 @@ class _CreateItemChildState extends State<CreateItemChild> {
                       },
                     ),
 
-                    DropdownMenu<String>(
-                      initialSelection: value.unitController.text.isEmpty
-                          ? null
-                          : value.unitController.text,
-                      controller: value.unitController,
-                      requestFocusOnTap: false,
-                      label: const Text('Unit'),
-                      expandedInsets: EdgeInsets.zero,
-                      onSelected: (String? string) {
-                        value.chooseUnit(string);
-                      },
-                      dropdownMenuEntries: value.unitList
-                          .map<DropdownMenuEntry<String>>((String string) {
-                        return DropdownMenuEntry<String>(
-                          value: string,
-                          label: string,
-                        );
-                      }).toList(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: DropdownMenu<String>(
+                        initialSelection: value.unitController.text.isEmpty
+                            ? null
+                            : value.unitController.text,
+                        controller: value.unitController,
+                        requestFocusOnTap: false,
+                        label: const Text('Unit'),
+                        expandedInsets: EdgeInsets.zero,
+                        onSelected: (String? string) {
+                          value.chooseUnit(string);
+                        },
+                        dropdownMenuEntries: value.unitList
+                            .map<DropdownMenuEntry<String>>((String string) {
+                          return DropdownMenuEntry<String>(
+                            value: string,
+                            label: string,
+                          );
+                        }).toList(),
+                      ),
                     ),
 
                     //length

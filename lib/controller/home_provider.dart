@@ -61,6 +61,21 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void navigateToCreateScreen(BuildContext context) {
+    if (scanResult.isNotEmpty) {
+      checkNavigate(context);
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CreateItemScreen(
+            unitList: [],
+          ),
+        ),
+      );
+    }
+  }
+
+  void checkNavigate(BuildContext context) {
     if (dataList.isEmpty) {
       // Trường hợp 1: dataList chưa có item nào
       if (unitList.isNotEmpty) {
@@ -68,7 +83,7 @@ class HomeProvider extends ChangeNotifier {
           context,
           MaterialPageRoute(
             builder: (context) => CreateItemScreen(
-              productModel: ProductModel(
+              product: ProductModel(
                 itemCode: scanResult,
                 barCode: '',
                 unitOfMeasure: unitList.first,
@@ -94,7 +109,7 @@ class HomeProvider extends ChangeNotifier {
         context,
         MaterialPageRoute(
           builder: (context) => CreateItemScreen(
-            productModel: dataList[0].copyWith(
+            product: dataList[0].copyWith(
               unitOfMeasure: getMissingUnits().first,
             ),
             unitList: getMissingUnits(),

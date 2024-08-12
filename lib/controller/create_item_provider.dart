@@ -17,6 +17,7 @@ class CreateItemProvider extends ChangeNotifier {
   final List<ProductModel> listData = [];
   List<String> unitList = [];
   late bool isBarcodeEnable = true;
+  late bool isItemCodeScanEnabled = false;
 
   //controllers
   final TextEditingController itemCodeController = TextEditingController();
@@ -36,14 +37,26 @@ class CreateItemProvider extends ChangeNotifier {
   String selectedHeightUnit = "";
   String selectedWeightUnit = "";
 
-  Future<void> init(ProductModel? productModel, List<String>? unitList) async {
-    itemCodeController.text = productModel?.itemCode ?? "";
-    if (productModel?.barCode != "") {
-      barCodeController.text = productModel?.barCode ?? "";
-      isBarcodeEnable = false;
+  Future<void> init(
+      String? itemNumber, ProductModel? product, List<String>? unitList) async {
+    if (itemNumber == null) {
+      isItemCodeScanEnabled = true;
+      notifyListeners();
     }
-    unitController.text = productModel?.unitOfMeasure ?? "";
-    this.unitList = unitList ?? [];
+    if (product != null && unitList != null) {
+      itemCodeController.text = product.itemCode;
+      if (product.barCode != "") {
+        barCodeController.text = product.barCode;
+        isBarcodeEnable = false;
+      }
+      unitController.text = product.unitOfMeasure;
+      unitList = unitList;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getUnitById(String itemNumber) async {
+    unitList = await apiService.getUnitById(itemNumber);
     notifyListeners();
   }
 
@@ -88,6 +101,8 @@ class CreateItemProvider extends ChangeNotifier {
     );
     if (res is String) {
       itemCodeController.text = handleScanResult(res, context);
+      await getUnitById(res);
+      unitController.text = unitList.first;
       notifyListeners();
     }
   }
@@ -127,19 +142,20 @@ class CreateItemProvider extends ChangeNotifier {
       return;
     }
 
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
+    final List<XFile> pickedFiles = await picker.pickMultiImage(
       maxWidth: 1024,
       maxHeight: 1024,
       imageQuality: 80,
     );
 
-    if (pickedFile != null) {
-      final fileSize = await pickedFile.length(); // Get file size
+    final List<XFile> validImages = [];
+
+    for (final pickedFile in pickedFiles) {
+      final fileSize = await pickedFile.length();
 
       if (fileSize <= 2 * 1024 * 1024) {
-        images.add(pickedFile);
-        notifyListeners();
+        // 2MB
+        validImages.add(pickedFile);
       } else {
         _showDialog(
           context,
@@ -147,6 +163,19 @@ class CreateItemProvider extends ChangeNotifier {
         );
       }
     }
+
+    if (validImages.isNotEmpty) {
+      if (images.length + validImages.length <= 5) {
+        images.addAll(validImages);
+        notifyListeners();
+      } else {
+        _showDialog(
+          context,
+          'Cannot add more than 5 images in total',
+        );
+      }
+    }
+
     Navigator.pop(context);
   }
 
