@@ -82,8 +82,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         controller: value.itemCodeController,
                         enabled: value.isItemCodeScanEnabled,
                         readOnly: true,
-                        decoration:
-                            const InputDecoration(labelText: 'Item Code'),
+                        decoration: const InputDecoration(labelText: 'SKU'),
                         onTap: () {
                           value.scanItemCode(context);
                         },
