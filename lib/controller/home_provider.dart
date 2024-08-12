@@ -60,11 +60,11 @@ class HomeProvider extends ChangeNotifier {
     return allUnits.difference(unitsInList).toList();
   }
 
-  void navigateToCreateScreen(BuildContext context) {
+  Future<void> navigateToCreateScreen(BuildContext context) async {
     if (scanResult.isNotEmpty) {
-      checkNavigate(context);
+      await checkNavigate(context);
     } else {
-      Navigator.push(
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => const CreateItemScreen(
@@ -72,14 +72,17 @@ class HomeProvider extends ChangeNotifier {
           ),
         ),
       );
+      if (result == 'refresh') {
+        await getProductsById(scanResult);
+      }
     }
   }
 
-  void checkNavigate(BuildContext context) {
+  Future<void> checkNavigate(BuildContext context) async {
     if (dataList.isEmpty) {
       // Trường hợp 1: dataList chưa có item nào
       if (unitList.isNotEmpty) {
-        Navigator.push(
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => CreateItemScreen(
@@ -99,13 +102,16 @@ class HomeProvider extends ChangeNotifier {
             ),
           ),
         );
+        if (result == 'refresh') {
+          await getProductsById(scanResult);
+        }
       } else {
         DialogHelper.showErrorDialog(
             context: context, message: "No available item.");
       }
     } else if (!containsAllUnits()) {
       // Trường hợp 2: dataList còn thiếu đơn vị đo lường nào
-      Navigator.push(
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => CreateItemScreen(
@@ -116,6 +122,9 @@ class HomeProvider extends ChangeNotifier {
           ),
         ),
       );
+      if (result == 'refresh') {
+        await getProductsById(scanResult);
+      }
     } else {
       // Trường hợp 3: dataList chứa tất cả đơn vị đo lường
       DialogHelper.showErrorDialog(
