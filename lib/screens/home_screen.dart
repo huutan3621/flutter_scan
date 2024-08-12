@@ -58,8 +58,41 @@ class _HomeChildState extends State<HomeChild> {
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
+                      // Expanded(
+                      //   child: GestureDetector(
+                      //     onTap: () async {
+                      //       var res = await Navigator.push(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //           builder: (context) =>
+                      //               const SimpleBarcodeScannerPage(),
+                      //         ),
+                      //       );
+                      //       if (res is String) {
+                      //         value.handleScanResult(res, context);
+                      //       }
+                      //     },
+                      //     child: TextField(
+                      //       enabled: false,
+                      //       controller:
+                      //           value.textController, // Display result here
+                      //       decoration: const InputDecoration(
+                      //           hintText: 'Scan item...',
+                      //           border: OutlineInputBorder(),
+                      //           suffixIcon: Icon(Icons.qr_code)),
+                      //     ),
+                      //   ),
+                      // ),
                       Expanded(
-                        child: GestureDetector(
+                        child: TextFormField(
+                          controller: value.textController,
+                          keyboardType: TextInputType.none,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                              labelText: 'Barcode',
+                              hintText: 'Scan item...',
+                              border: OutlineInputBorder(),
+                              suffixIcon: Icon(Icons.qr_code)),
                           onTap: () async {
                             var res = await Navigator.push(
                               context,
@@ -72,15 +105,7 @@ class _HomeChildState extends State<HomeChild> {
                               value.handleScanResult(res, context);
                             }
                           },
-                          child: TextField(
-                            enabled: false,
-                            controller:
-                                value.textController, // Display result here
-                            decoration: const InputDecoration(
-                                hintText: 'Scan item...',
-                                border: OutlineInputBorder(),
-                                suffixIcon: Icon(Icons.qr_code)),
-                          ),
+                          onChanged: (value) {},
                         ),
                       ),
                       const SizedBox(width: 8),

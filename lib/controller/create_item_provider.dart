@@ -44,7 +44,7 @@ class CreateItemProvider extends ChangeNotifier {
     barCodeController.text = productModel?.barCode ?? "";
     unitController.text = productModel?.unitOfMeasure ?? "";
     this.unitList = unitList ?? [];
-    notifyListeners(); // Notify listeners to update the UI
+    notifyListeners();
   }
 
   String handleScanResult(String result, BuildContext context) {
@@ -120,7 +120,7 @@ class CreateItemProvider extends ChangeNotifier {
       ),
     );
     if (res is String) {
-      barCodeController.text = handleScanResult(res, context);
+      barCodeController.text = res;
       notifyListeners();
     }
   }

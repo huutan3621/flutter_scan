@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
 class Utils {
-  static String handleScanResult(String result, BuildContext context) {
-    if (isValidQRCode(result) || isValidBarcode(result)) {
-      return result;
-    } else if (isValidTextFormat(result)) {
-      return result = extractNumberFromText(result);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mã quét không hợp lệ.')),
-      );
-      return "";
-    }
-  }
+  // static String handleScanResult(String result, BuildContext context) {
+  //   if (isValidQRCode(result) || isValidBarcode(result)) {
+  //     return result;
+  //   } else if (isValidTextFormat(result)) {
+  //     return result = extractNumberFromText(result);
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Mã quét không hợp lệ.')),
+  //     );
+  //     return "";
+  //   }
+  // }
 
   static String handleTSScanResult(String result, BuildContext context) {
     if (isValidQRCode(result)) {

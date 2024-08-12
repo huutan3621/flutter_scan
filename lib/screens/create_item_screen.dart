@@ -79,10 +79,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                           decoration:
                               const InputDecoration(labelText: 'Barcode')),
                     ),
-                    // TextFormField(
-                    //     controller: value.unitController,
-                    //     enabled: false,
-                    //     decoration: const InputDecoration(labelText: 'Unit')),
+
                     DropdownMenu<String>(
                       initialSelection: value.unitController.text.isEmpty
                           ? null

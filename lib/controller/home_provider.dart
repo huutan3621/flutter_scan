@@ -16,13 +16,20 @@ class HomeProvider extends ChangeNotifier {
 
   Future<void> init(BuildContext context) async {}
 
+  Future<void> changeResult() async {}
+
   Future<void> handleScanResult(String result, BuildContext context) async {
     scanResult = Utils.handleTSScanResult(result, context);
     textController.text = scanResult;
     notifyListeners();
-    // scanResult = "900504";
-    await getProductsById(scanResult);
-    await getUnitById(scanResult);
+    if (scanResult != "") {
+      await getProductsById(scanResult);
+      await getUnitById(scanResult);
+    } else {
+      dataList.clear();
+      unitList.clear();
+      notifyListeners();
+    }
   }
 
   Future<void> getProductsById(String itemNumber) async {
