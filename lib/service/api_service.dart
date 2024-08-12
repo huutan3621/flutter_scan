@@ -114,24 +114,58 @@ class ApiService {
     }
   }
 
+  // Future<bool> updateProductImage(int productId, List<XFile> images) async {
+  //   try {
+  //     FormData formData = FormData();
+
+  //     formData.fields.add(MapEntry('productId', productId.toString()));
+
+  //     for (var file in images) {
+  //       final fileName = file.path.split('/').last;
+  //       final fileBytes = await file.readAsBytes();
+
+  //       formData.files.add(MapEntry(
+  //         'files',
+  //         MultipartFile.fromBytes(
+  //           fileBytes,
+  //           filename: fileName,
+  //         ),
+  //       ));
+  //     }
+
+  //     final response = await dio.post(
+  //       '$baseUrl/api/ScanProduct/update-scan-product-image',
+  //       data: formData,
+  //       options: Options(headers: {'Content-Type': 'multipart/form-data'}),
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       _handleSuccessDialog("Upload image successfully");
+  //       return true;
+  //     } else {
+  //       debugPrint(
+  //           'Failed to update product image. Status code: ${response.statusCode}');
+  //       debugPrint('Response body: ${response.data}');
+  //       return false;
+  //     }
+  //   } on DioException catch (e) {
+  //     _handleDioError(e);
+  //     rethrow;
+  //   } catch (e) {
+  //     debugPrint('Error updating product image: $e');
+  //     rethrow;
+  //   }
+  // }
   Future<bool> updateProductImage(int productId, List<XFile> images) async {
     try {
-      FormData formData = FormData();
-
-      formData.fields.add(MapEntry('productId', productId.toString()));
-
-      for (var file in images) {
-        final fileName = file.path.split('/').last;
-        final fileBytes = await file.readAsBytes();
-
-        formData.files.add(MapEntry(
-          'files',
-          MultipartFile.fromBytes(
-            fileBytes,
-            filename: fileName,
-          ),
-        ));
-      }
+      FormData formData = FormData.fromMap({
+        'productId': productId.toString(),
+        'files': await Future.wait(images.map((file) async {
+          final fileName = file.path.split('/').last;
+          final fileBytes = await file.readAsBytes();
+          return MultipartFile.fromBytes(fileBytes, filename: fileName);
+        })),
+      });
 
       final response = await dio.post(
         '$baseUrl/api/ScanProduct/update-scan-product-image',

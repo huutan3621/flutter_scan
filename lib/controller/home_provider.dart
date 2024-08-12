@@ -153,8 +153,14 @@ class HomeProvider extends ChangeNotifier {
       );
     } else {
       // Trường hợp 3: dataList chứa tất cả đơn vị đo lường
-      DialogHelper.showErrorDialog(
-          context: context, message: "All item units are included");
+      // DialogHelper.showErrorDialog(
+      //     context: context, message: "All item units are included");
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CreateItemScreen(),
+        ),
+      );
     }
   }
 

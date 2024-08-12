@@ -126,8 +126,36 @@ class _HomeChildState extends State<HomeChild> {
                             ),
                           ],
                         ),
-                        value.scanResult.isNotEmpty
+                        value.scanResult.isEmpty || value.dataList.isEmpty
                             ? Container(
+                                color: Colors.white,
+                                child: SingleChildScrollView(
+                                    child: Table(
+                                  border: TableBorder.all(color: Colors.black),
+                                  columnWidths: const {
+                                    0: FixedColumnWidth(850),
+                                  },
+                                  children: const [
+                                    TableRow(children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(16),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.error,
+                                                size: 24, color: Colors.red),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              "Không có giá trị",
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ])
+                                  ],
+                                )),
+                              )
+                            : Container(
                                 color: Colors.white,
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
@@ -219,34 +247,6 @@ class _HomeChildState extends State<HomeChild> {
                                   ),
                                 ),
                               )
-                            : Container(
-                                color: Colors.white,
-                                child: SingleChildScrollView(
-                                    child: Table(
-                                  border: TableBorder.all(color: Colors.black),
-                                  columnWidths: const {
-                                    0: FixedColumnWidth(850),
-                                  },
-                                  children: const [
-                                    TableRow(children: [
-                                      Padding(
-                                        padding: EdgeInsets.all(16),
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.error,
-                                                size: 24, color: Colors.red),
-                                            SizedBox(width: 8),
-                                            Text(
-                                              "Không có giá trị",
-                                              style: TextStyle(fontSize: 16),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ])
-                                  ],
-                                )),
-                              ),
                       ],
                     ),
                   ),
