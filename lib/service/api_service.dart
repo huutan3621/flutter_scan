@@ -59,7 +59,7 @@ class ApiService {
             'Failed to load products. Status code: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      _handleDioError(e);
+      _handleErrorDialog(e.response?.data);
       rethrow;
     } catch (e) {
       debugPrint('Error fetching products: $e');
@@ -82,7 +82,7 @@ class ApiService {
             'Failed to load units. Status code: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      _handleDioError(e);
+      _handleErrorDialog(e.response?.data);
       rethrow;
     } catch (e) {
       debugPrint('Error fetching units: $e');
@@ -99,14 +99,13 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        _handleSuccessDialog("Create successfully");
         return ProductModel.fromJson(response.data);
       } else {
         throw Exception(
             'Failed to create item. Status code: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      _handleDioError(e);
+      _handleErrorDialog(e.response?.data);
       rethrow;
     } catch (e) {
       debugPrint('Error creating item: $e');
@@ -183,7 +182,7 @@ class ApiService {
         return false;
       }
     } on DioException catch (e) {
-      _handleDioError(e);
+      _handleErrorDialog(e.response?.data);
       rethrow;
     } catch (e) {
       debugPrint('Error updating product image: $e');
@@ -195,6 +194,18 @@ class ApiService {
     final context = navigatorKey.currentContext;
     if (context != null) {
       DialogHelper.showSuccessDialog(
+        context: context,
+        message: message,
+      );
+    } else {
+      debugPrint('Error: Unable to show dialog because context is null.');
+    }
+  }
+
+  void _handleErrorDialog(String message) {
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      DialogHelper.showErrorDialog(
         context: context,
         message: message,
       );

@@ -5,6 +5,7 @@ import 'package:flutter_scanner_app/controller/create_item_provider.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/widgets/custom_button.dart';
 import 'package:flutter_scanner_app/widgets/custom_textform_field.dart';
+import 'package:flutter_scanner_app/widgets/custom_validate_dropdown.dart';
 import 'package:provider/provider.dart';
 
 class CreateItemScreen extends StatelessWidget {
@@ -49,6 +50,8 @@ class CreateItemChild extends StatefulWidget {
 }
 
 class _CreateItemChildState extends State<CreateItemChild> {
+  final _formKey = GlobalKey<FormState>(); // Add a global key for form
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -76,7 +79,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Form(
-                  key: value.formKey,
+                  key: _formKey, // Assign the global key to Form
                   child: Column(
                     children: [
                       TextFormField(
@@ -88,6 +91,12 @@ class _CreateItemChildState extends State<CreateItemChild> {
                           value.scanItemCode(context);
                         },
                         onChanged: (value) {},
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
                       ),
                       TextFormField(
                         controller: value.barCodeController,
@@ -105,35 +114,31 @@ class _CreateItemChildState extends State<CreateItemChild> {
                           return null;
                         },
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: DropdownMenu<String>(
-                          initialSelection: value.unitController.text.isEmpty
-                              ? null
-                              : value.unitController.text,
-                          controller: value.unitController,
-                          requestFocusOnTap: false,
-                          label: const Text('Unit'),
-                          expandedInsets: EdgeInsets.zero,
-                          onSelected: (String? string) {
-                            value.chooseUnit(string);
-                          },
-                          dropdownMenuEntries: value.unitList
-                              .map<DropdownMenuEntry<String>>((String string) {
-                            return DropdownMenuEntry<String>(
-                              value: string,
-                              label: string,
-                            );
-                          }).toList(),
-                        ),
+                      CustomValidateDropDown(
+                        label: "Unit",
+                        unit: value.selectedProductUnit,
+                        unitList: value.unitList,
+                        isRequired: true,
+                        onSelected: (p0) {
+                          value.chooseUnit(p0);
+                        },
+                        validator: (selectedUnit) {
+                          if (value.unitList.isEmpty ?? true) {
+                            return 'No options available';
+                          }
+                          if (selectedUnit == null || selectedUnit.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null; // No validation errors
+                        },
                       ),
                       SelectUnitTextFormField(
                         controller: value.lengthController,
                         label: "Length",
                         unit: value.selectedLengthUnit,
+                        selectedUnit: value.selectedLengthUnit,
                         callback: (previousValue, currentValue) {
-                          value.updateSelectedLengthUnit(
-                              previousValue, currentValue);
+                          value.updateSelectedUnit(previousValue, currentValue);
                         },
                         unitList: value.lengthUnit,
                         isRequired: true,
@@ -141,10 +146,10 @@ class _CreateItemChildState extends State<CreateItemChild> {
                       SelectUnitTextFormField(
                         controller: value.widthController,
                         label: "Width",
-                        unit: value.selectedWidthUnit,
+                        unit: value.selectedLengthUnit,
+                        selectedUnit: value.selectedLengthUnit,
                         callback: (previousValue, currentValue) {
-                          value.updateSelectedWidthUnit(
-                              previousValue, currentValue);
+                          value.updateSelectedUnit(previousValue, currentValue);
                         },
                         unitList: value.lengthUnit,
                         isRequired: true,
@@ -152,10 +157,10 @@ class _CreateItemChildState extends State<CreateItemChild> {
                       SelectUnitTextFormField(
                         controller: value.heightController,
                         label: "Height",
-                        unit: value.selectedHeightUnit,
+                        unit: value.selectedLengthUnit,
+                        selectedUnit: value.selectedLengthUnit,
                         callback: (previousValue, currentValue) {
-                          value.updateSelectedHeightUnit(
-                              previousValue, currentValue);
+                          value.updateSelectedUnit(previousValue, currentValue);
                         },
                         unitList: value.lengthUnit,
                         isRequired: true,
@@ -164,6 +169,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         controller: value.weightController,
                         label: "Weight",
                         unit: value.selectedWeightUnit,
+                        selectedUnit: value.selectedWeightUnit,
                         callback: (previousValue, currentValue) {
                           value.updateSelectedWeightUnit(
                               previousValue, currentValue);
@@ -192,17 +198,13 @@ class _CreateItemChildState extends State<CreateItemChild> {
                       const SizedBox(height: 16),
                       CustomButton(
                         onTap: () async {
-                          value.onSubmit(context);
+                          if (_formKey.currentState?.validate() ?? false) {
+                            // Form is valid, proceed with submission
+                            value.onSubmit(context);
+                          }
                         },
                         title: 'Submit',
                       ),
-                      // CustomButton(
-                      //     onTap: () {
-                      //       print("eeeeeeeeeeee");
-                      //       print("eeeeeeeeeeee");
-                      //       print("eeeeeeeeeeee");
-                      //     },
-                      //     title: "eeee"),
                     ],
                   ),
                 ),

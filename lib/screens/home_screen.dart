@@ -81,7 +81,6 @@ class _HomeChildState extends State<HomeChild> {
                               value.handleScanResult(res, context);
                             }
                           },
-                          onChanged: (value) {},
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -95,198 +94,210 @@ class _HomeChildState extends State<HomeChild> {
                   ),
                 ),
                 Container(
-                  color: Colors.orange,
                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Column(
-                      children: [
-                        Table(
-                          border: TableBorder.all(color: Colors.black),
-                          columnWidths: const {
-                            0: FixedColumnWidth(100),
-                            1: FixedColumnWidth(100),
-                            2: FixedColumnWidth(100),
-                            3: FixedColumnWidth(100),
-                            4: FixedColumnWidth(100),
-                            5: FixedColumnWidth(100),
-                            6: FixedColumnWidth(100),
-                            7: FixedColumnWidth(150),
+                  child: value.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : RefreshIndicator(
+                          onRefresh: () async {
+                            await value.getProductsById(value.scanResult);
                           },
-                          children: [
-                            TableRow(
-                              children: [
-                                _buildHeaderCell('Item Code'),
-                                _buildHeaderCell('Bar Code'),
-                                _buildHeaderCell('Unit'),
-                                _buildHeaderCell('Length (mm)'),
-                                _buildHeaderCell('Width (mm)'),
-                                _buildHeaderCell('Height (mm)'),
-                                _buildHeaderCell('Weight (mg)'),
-                                _buildHeaderCell('Image'),
-                              ],
-                            ),
-                          ],
-                        ),
-                        value.scanResult.isEmpty || value.dataList.isEmpty
-                            ? Container(
-                                color: Colors.white,
-                                child: SingleChildScrollView(
-                                    child: Table(
-                                  border: TableBorder.all(color: Colors.black),
-                                  columnWidths: const {
-                                    0: FixedColumnWidth(850),
-                                  },
-                                  children: const [
-                                    TableRow(children: [
-                                      Padding(
-                                        padding: EdgeInsets.all(16),
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.error,
-                                                size: 24, color: Colors.red),
-                                            SizedBox(width: 8),
-                                            Text(
-                                              "Empty",
-                                              style: TextStyle(fontSize: 16),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ])
-                                  ],
-                                )),
-                              )
-                            : Container(
-                                color: Colors.white,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Table(
-                                    border:
-                                        TableBorder.all(color: Colors.black),
-                                    columnWidths: const {
-                                      0: FixedColumnWidth(100),
-                                      1: FixedColumnWidth(100),
-                                      2: FixedColumnWidth(100),
-                                      3: FixedColumnWidth(100),
-                                      4: FixedColumnWidth(100),
-                                      5: FixedColumnWidth(100),
-                                      6: FixedColumnWidth(100),
-                                      7: FixedColumnWidth(150),
-                                    },
-                                    children: List.generate(
-                                        value.dataList.length, (rowIndex) {
-                                      final List<ImageViewModel> images =
-                                          value.dataList[rowIndex].images ?? [];
-
-                                      final hasMoreImages = images.length > 1;
-
-                                      return TableRow(children: [
-                                        _buildDataCell(value
-                                            .dataList[rowIndex].itemCode
-                                            .toString()),
-                                        _buildDataCell(
-                                            value.dataList[rowIndex].barCode),
-                                        _buildDataCell(value
-                                            .dataList[rowIndex].unitOfMeasure
-                                            .toString()),
-                                        _buildDataCell(value
-                                            .dataList[rowIndex].length
-                                            .toString()),
-                                        _buildDataCell(value
-                                            .dataList[rowIndex].width
-                                            .toString()),
-                                        _buildDataCell(value
-                                            .dataList[rowIndex].height
-                                            .toString()),
-                                        _buildDataCell(value
-                                            .dataList[rowIndex].weight
-                                            .toString()),
-                                        GestureDetector(
-                                          onTap: () {
-                                            if (images.isNotEmpty) {
-                                              value.showImagePreviewDialog(
-                                                  context, images);
-                                            }
-                                          },
-                                          child: Row(
-                                            children: [
-                                              if (images.isNotEmpty)
-                                                Flexible(
-                                                  child: AspectRatio(
-                                                    aspectRatio: 1.25,
-                                                    child: Container(
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              right: 8.0),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                        child: Image.network(
-                                                          images[0].url ?? "",
-                                                          fit: BoxFit.cover,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              if (hasMoreImages)
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(horizontal: 8),
-                                                  child: Text(
-                                                    '+${images.length - 1} more',
-                                                    style: const TextStyle(
-                                                        fontSize: 16),
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ]);
-                                    }),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                              columnSpacing: 12,
+                              dataRowHeight: 100,
+                              border: TableBorder.all(
+                                color: Colors.black,
+                                width: 1,
+                              ),
+                              columns: [
+                                DataColumn(
+                                  label: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Item Code',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
                                   ),
                                 ),
-                              )
-                      ],
-                    ),
-                  ),
+                                DataColumn(
+                                  label: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Bar Code',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Unit',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Length (mm)',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Width (mm)',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Height (mm)',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Weight (mg)',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: const Text('Image',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                              ],
+                              rows: value.dataList.isEmpty
+                                  ? [
+                                      DataRow(
+                                        cells: [
+                                          DataCell(
+                                            Container(
+                                              padding: const EdgeInsets.all(16),
+                                              child: const Center(
+                                                child: Text("No data available",
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors.red)),
+                                              ),
+                                            ),
+                                          ),
+                                          ...List.generate(
+                                            7,
+                                            (index) => DataCell(Container()),
+                                          ),
+                                        ],
+                                      ),
+                                    ]
+                                  : List.generate(
+                                      value.dataList.length,
+                                      (rowIndex) {
+                                        final List<ImageViewModel> images =
+                                            value.dataList[rowIndex].images ??
+                                                [];
+                                        final hasMoreImages = images.length > 1;
+
+                                        return DataRow(
+                                          cells: [
+                                            DataCell(Container(
+                                              child: Center(
+                                                  child: Text(value
+                                                      .dataList[rowIndex]
+                                                      .itemCode
+                                                      .toString())),
+                                            )),
+                                            DataCell(Container(
+                                              child: Center(
+                                                  child: Text(value
+                                                      .dataList[rowIndex]
+                                                      .barCode)),
+                                            )),
+                                            DataCell(Container(
+                                              child: Center(
+                                                  child: Text(value
+                                                      .dataList[rowIndex]
+                                                      .unitOfMeasure
+                                                      .toString())),
+                                            )),
+                                            DataCell(Container(
+                                              child: Center(
+                                                  child: Text(value
+                                                      .dataList[rowIndex].length
+                                                      .toString())),
+                                            )),
+                                            DataCell(Container(
+                                              child: Center(
+                                                  child: Text(value
+                                                      .dataList[rowIndex].width
+                                                      .toString())),
+                                            )),
+                                            DataCell(Container(
+                                              child: Center(
+                                                  child: Text(value
+                                                      .dataList[rowIndex].height
+                                                      .toString())),
+                                            )),
+                                            DataCell(Container(
+                                              child: Center(
+                                                  child: Text(value
+                                                      .dataList[rowIndex].weight
+                                                      .toString())),
+                                            )),
+                                            DataCell(Container(
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  if (images.isNotEmpty) {
+                                                    value
+                                                        .showImagePreviewDialog(
+                                                            context, images);
+                                                  }
+                                                },
+                                                child: Container(
+                                                  width: 100,
+                                                  height: 80,
+                                                  margin: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 16,
+                                                      vertical: 8),
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                    child: images.isNotEmpty
+                                                        ? Image.network(
+                                                            images[0].url ?? "",
+                                                            fit: BoxFit.cover,
+                                                          )
+                                                        : Container(
+                                                            color: Colors
+                                                                .grey[200],
+                                                          ),
+                                                  ),
+                                                ),
+                                              ),
+                                            )),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                            ),
+                          ),
+                        ),
                 ),
               ],
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildHeaderCell(String text) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      child: Center(
-        child: Text(
-          text,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDataCell(String text) {
-    return GestureDetector(
-      onTap: null,
-      child: Container(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Text(
-            text,
-            style: const TextStyle(fontSize: 16),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
     );
   }
 }

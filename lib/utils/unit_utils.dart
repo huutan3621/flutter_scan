@@ -4,15 +4,38 @@ import 'package:collection/collection.dart';
 class UnitUtils {
   static String convertLength(
       String value, String previousUnit, String currentUnit) {
-    return UnitUtils.convertUnit(int.parse(value), previousUnit, currentUnit)
-        .toString();
+    if (value.isEmpty) {
+      // Nếu không có giá trị đầu vào, trả về giá trị hiện tại không thay đổi.
+      return value;
+    }
+
+    try {
+      final intValue = int.parse(value);
+      return UnitUtils.convertUnit(intValue, previousUnit, currentUnit)
+          .toString();
+    } catch (e) {
+      // Xử lý lỗi khi không thể chuyển đổi giá trị
+      print('Error converting length: $e');
+      return value; // Giữ nguyên giá trị hiện tại
+    }
   }
 
   static String convertWeight(
       String value, String previousUnit, String currentUnit) {
-    return UnitUtils.convertWeightUnit(
-            int.parse(value), previousUnit, currentUnit)
-        .toString();
+    if (value.isEmpty) {
+      // Nếu không có giá trị đầu vào, trả về giá trị hiện tại không thay đổi.
+      return value;
+    }
+
+    try {
+      final intValue = int.parse(value);
+      return UnitUtils.convertWeightUnit(intValue, previousUnit, currentUnit)
+          .toString();
+    } catch (e) {
+      // Xử lý lỗi khi không thể chuyển đổi giá trị
+      print('Error converting weight: $e');
+      return value; // Giữ nguyên giá trị hiện tại
+    }
   }
 
   static int convertUnit(int value, String unitInput, String unitOutput) {
@@ -22,6 +45,7 @@ class UnitUtils {
     LengthUnitEnum unitOutputEnum =
         LengthUnitEnum.values.firstWhereOrNull((e) => e.name == unitOutput) ??
             LengthUnitEnum.mm;
+
     switch (unitInputEnum) {
       case LengthUnitEnum.m:
         return convertMToUnit(value, unitInputEnum, unitOutputEnum);
@@ -90,7 +114,7 @@ class UnitUtils {
     }
   }
 
-  //weight
+  // Weight conversion methods
   static int convertWeightUnit(int value, String unitInput, String unitOutput) {
     WeightUnitEnum unitInputEnum =
         WeightUnitEnum.values.firstWhereOrNull((e) => e.name == unitInput) ??
@@ -98,6 +122,7 @@ class UnitUtils {
     WeightUnitEnum unitOutputEnum =
         WeightUnitEnum.values.firstWhereOrNull((e) => e.name == unitOutput) ??
             WeightUnitEnum.g;
+
     switch (unitInputEnum) {
       case WeightUnitEnum.kg:
         return convertKgToUnit(value, unitInputEnum, unitOutputEnum);

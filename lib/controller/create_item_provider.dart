@@ -10,7 +10,6 @@ import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class CreateItemProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
-
   final formKey = GlobalKey<FormState>();
   final ImagePicker picker = ImagePicker();
   final List<XFile> images = [];
@@ -19,23 +18,22 @@ class CreateItemProvider extends ChangeNotifier {
   late bool isBarcodeEnable = true;
   late bool isItemCodeScanEnabled = false;
 
-  //controllers
+  // Controllers
   final TextEditingController itemCodeController = TextEditingController();
   final TextEditingController barCodeController = TextEditingController();
-  final TextEditingController unitController = TextEditingController();
   final TextEditingController lengthController = TextEditingController();
   final TextEditingController widthController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
 
+  // Selected unit
+  String selectedLengthUnit = "";
+  String selectedWeightUnit = "";
+  String selectedProductUnit = "";
+
+  // Available units
   List<String> lengthUnit = LengthUnitEnum.values.map((e) => e.name).toList();
   List<String> weightUnit = WeightUnitEnum.values.map((e) => e.name).toList();
-
-  //selected unit
-  String selectedLengthUnit = "";
-  String selectedWidthUnit = "";
-  String selectedHeightUnit = "";
-  String selectedWeightUnit = "";
 
   Future<void> init(String? itemNumber, ProductModel? product,
       List<String>? unitListData) async {
@@ -49,14 +47,22 @@ class CreateItemProvider extends ChangeNotifier {
         barCodeController.text = product.barCode;
         isBarcodeEnable = false;
       }
-      unitController.text = product.unitOfMeasure;
+      selectedProductUnit = product.unitOfMeasure;
+      selectedLengthUnit = lengthUnit.first;
+      selectedWeightUnit = weightUnit.first;
       unitList = unitListData ?? [];
       notifyListeners();
     }
+    selectedLengthUnit = lengthUnit.first;
+    selectedWeightUnit = weightUnit.first;
+    notifyListeners();
   }
 
   Future<void> getUnitById(String itemNumber) async {
     unitList = await apiService.getUnitById(itemNumber);
+    if (unitList.isNotEmpty) {
+      selectedLengthUnit = unitList.first;
+    }
     notifyListeners();
   }
 
@@ -64,31 +70,21 @@ class CreateItemProvider extends ChangeNotifier {
     return Utils.handleTSScanResult(result, context);
   }
 
-  void updateSelectedLengthUnit(String previousValue, String currentValue) {
+  void updateSelectedUnit(String previousValue, String currentValue) {
     selectedLengthUnit = currentValue;
     lengthController.text = UnitUtils.convertLength(
-        lengthController.text, previousValue, currentValue);
-    notifyListeners();
-  }
-
-  void updateSelectedWidthUnit(String previousValue, String currentValue) {
-    selectedWidthUnit = currentValue;
+        lengthController.text, previousValue, selectedLengthUnit);
     widthController.text = UnitUtils.convertLength(
-        widthController.text, previousValue, currentValue);
-    notifyListeners();
-  }
-
-  void updateSelectedHeightUnit(String previousValue, String currentValue) {
-    selectedHeightUnit = currentValue;
+        widthController.text, previousValue, selectedLengthUnit);
     heightController.text = UnitUtils.convertLength(
-        heightController.text, previousValue, currentValue);
+        heightController.text, previousValue, selectedLengthUnit);
     notifyListeners();
   }
 
   void updateSelectedWeightUnit(String previousValue, String currentValue) {
-    selectedWeightUnit = currentValue;
+    selectedLengthUnit = currentValue;
     weightController.text = UnitUtils.convertWeight(
-        weightController.text, previousValue, currentValue);
+        weightController.text, previousValue, selectedLengthUnit);
     notifyListeners();
   }
 
@@ -102,7 +98,6 @@ class CreateItemProvider extends ChangeNotifier {
     if (res is String) {
       itemCodeController.text = handleScanResult(res, context);
       await getUnitById(res);
-      unitController.text = unitList.first;
       notifyListeners();
     }
   }
@@ -129,7 +124,7 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   void chooseUnit(String? value) {
-    unitController.text = value ?? "";
+    selectedProductUnit = value ?? "";
     notifyListeners();
   }
 
@@ -154,7 +149,6 @@ class CreateItemProvider extends ChangeNotifier {
       final fileSize = await pickedFile.length();
 
       if (fileSize <= 2 * 1024 * 1024) {
-        // 2MB
         validImages.add(pickedFile);
       } else {
         _showDialog(
@@ -196,7 +190,7 @@ class CreateItemProvider extends ChangeNotifier {
     );
 
     if (pickedFile != null) {
-      final fileSize = await pickedFile.length(); // Get file size
+      final fileSize = await pickedFile.length();
 
       if (fileSize <= 2 * 1024 * 1024) {
         images.add(pickedFile);
@@ -217,28 +211,25 @@ class CreateItemProvider extends ChangeNotifier {
     } else {
       _showDialog(context, 'Please fix the errors in the form');
     }
-    createItem();
   }
 
   Future<void> createItem() async {
     ProductModel body = ProductModel(
       itemCode: itemCodeController.text,
       barCode: barCodeController.text,
-      unitOfMeasure: unitController.text,
+      unitOfMeasure: selectedLengthUnit,
       length: int.parse(UnitUtils.convertLength(
           lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name)),
       width: int.parse(UnitUtils.convertLength(
-          widthController.text, selectedWidthUnit, LengthUnitEnum.mm.name)),
+          widthController.text, selectedLengthUnit, LengthUnitEnum.mm.name)),
       height: int.parse(UnitUtils.convertLength(
-          heightController.text, selectedHeightUnit, LengthUnitEnum.mm.name)),
+          heightController.text, selectedLengthUnit, LengthUnitEnum.mm.name)),
       weight: int.parse(UnitUtils.convertWeight(
-          weightController.text, selectedWeightUnit, WeightUnitEnum.g.name)),
+          weightController.text, selectedLengthUnit, WeightUnitEnum.g.name)),
       createBy: "User",
     );
     final response = await apiService.createItem(body);
-    print("aaa ${response.productId}");
     uploadImage(response.productId ?? 0);
-    // uploadImage(50);
   }
 
   Future<void> uploadImage(int productId) async {
