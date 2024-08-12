@@ -175,7 +175,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () async {
-                        
+                        value.onSubmit(context);
                       },
                       child: const Text('Submit'),
                     ),

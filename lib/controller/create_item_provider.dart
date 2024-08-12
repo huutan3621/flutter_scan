@@ -57,33 +57,29 @@ class CreateItemProvider extends ChangeNotifier {
 
   void updateSelectedLengthUnit(String previousValue, String currentValue) {
     selectedLengthUnit = currentValue;
-    lengthController.text = UnitUtils.convertUnit(
-            int.parse(lengthController.text), previousValue, currentValue)
-        .toString();
+    lengthController.text = UnitUtils.convertLength(
+        lengthController.text, previousValue, currentValue);
     notifyListeners();
   }
 
   void updateSelectedWidthUnit(String previousValue, String currentValue) {
     selectedWidthUnit = currentValue;
-    widthController.text = UnitUtils.convertUnit(
-            int.parse(widthController.text), previousValue, currentValue)
-        .toString();
+    widthController.text = UnitUtils.convertLength(
+        widthController.text, previousValue, currentValue);
     notifyListeners();
   }
 
   void updateSelectedHeightUnit(String previousValue, String currentValue) {
     selectedHeightUnit = currentValue;
-    heightController.text = UnitUtils.convertUnit(
-            int.parse(heightController.text), previousValue, currentValue)
-        .toString();
+    heightController.text = UnitUtils.convertLength(
+        heightController.text, previousValue, currentValue);
     notifyListeners();
   }
 
   void updateSelectedWeightUnit(String previousValue, String currentValue) {
     selectedWeightUnit = currentValue;
-    weightController.text = UnitUtils.convertWeightUnit(
-            int.parse(weightController.text), previousValue, currentValue)
-        .toString();
+    weightController.text = UnitUtils.convertWeight(
+        weightController.text, previousValue, currentValue);
     notifyListeners();
   }
 
@@ -190,7 +186,7 @@ class CreateItemProvider extends ChangeNotifier {
     Navigator.pop(context);
   }
 
-  void validateRequiredField(BuildContext context) {
+  void onSubmit(BuildContext context) {
     if (formKey.currentState!.validate()) {
       createItem();
     } else {
@@ -203,10 +199,14 @@ class CreateItemProvider extends ChangeNotifier {
       itemCode: itemCodeController.text,
       barCode: barCodeController.text,
       unitOfMeasure: unitController.text,
-      length: int.parse(lengthController.text),
-      width: int.parse(widthController.text),
-      weight: int.parse(weightController.text),
-      height: int.parse(heightController.text),
+      length: int.parse(UnitUtils.convertLength(
+          lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name)),
+      width: int.parse(UnitUtils.convertLength(
+          widthController.text, selectedWidthUnit, LengthUnitEnum.mm.name)),
+      height: int.parse(UnitUtils.convertLength(
+          heightController.text, selectedHeightUnit, LengthUnitEnum.mm.name)),
+      weight: int.parse(UnitUtils.convertWeight(
+          weightController.text, selectedWeightUnit, WeightUnitEnum.g.name)),
       createBy: "User",
     );
     final response = await apiService.createItem(body);

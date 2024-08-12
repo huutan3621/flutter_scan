@@ -2,6 +2,19 @@ import 'package:flutter_scanner_app/model/enum.dart';
 import 'package:collection/collection.dart';
 
 class UnitUtils {
+  static String convertLength(
+      String value, String previousUnit, String currentUnit) {
+    return UnitUtils.convertUnit(int.parse(value), previousUnit, currentUnit)
+        .toString();
+  }
+
+  static String convertWeight(
+      String value, String previousUnit, String currentUnit) {
+    return UnitUtils.convertWeightUnit(
+            int.parse(value), previousUnit, currentUnit)
+        .toString();
+  }
+
   static int convertUnit(int value, String unitInput, String unitOutput) {
     LengthUnitEnum unitInputEnum =
         LengthUnitEnum.values.firstWhereOrNull((e) => e.name == unitInput) ??
