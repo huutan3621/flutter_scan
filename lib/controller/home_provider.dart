@@ -60,56 +60,6 @@ class HomeProvider extends ChangeNotifier {
     return allUnits.difference(unitsInList).toList();
   }
 
-  // void navigateToCreateScreen(BuildContext context) {
-  //   if (containsAllUnits()) {
-  //     Navigator.push(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (context) => const CreateItemScreen(
-  //             // productModel: dataList[0],
-  //             // unitList: unitList,
-  //             ),
-  //       ),
-  //     );
-  //     print("object");
-  //   } else {
-  //     if (dataList.isNotEmpty) {
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (context) => CreateItemScreen(
-  //             productModel: dataList[0].copyWith(
-  //               unitOfMeasure: getMissingUnits().first,
-  //             ),
-  //             unitList: unitList,
-  //           ),
-  //         ),
-  //       );
-  //       print("object222");
-  //     } else {
-  //       // Replace SnackBar with AlertDialog
-  //       showDialog(
-  //         context: context,
-  //         builder: (BuildContext context) {
-  //           return AlertDialog(
-  //             title: const Text('No Items Available'),
-  //             content:
-  //                 const Text('No items available to pass to CreateItemScreen.'),
-  //             actions: <Widget>[
-  //               TextButton(
-  //                 child: const Text('OK'),
-  //                 onPressed: () {
-  //                   Navigator.of(context).pop();
-  //                 },
-  //               ),
-  //             ],
-  //           );
-  //         },
-  //       );
-  //     }
-  //   }
-  // }
-
   void navigateToCreateScreen(BuildContext context) {
     if (dataList.isEmpty) {
       // Trường hợp 1: dataList chưa có item nào
@@ -153,14 +103,8 @@ class HomeProvider extends ChangeNotifier {
       );
     } else {
       // Trường hợp 3: dataList chứa tất cả đơn vị đo lường
-      // DialogHelper.showErrorDialog(
-      //     context: context, message: "All item units are included");
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const CreateItemScreen(),
-        ),
-      );
+      DialogHelper.showErrorDialog(
+          context: context, message: "All item units are included");
     }
   }
 

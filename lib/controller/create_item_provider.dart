@@ -183,33 +183,33 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   void onSubmit(BuildContext context) {
-    // if (formKey.currentState!.validate()) {
-    //   createItem();
-    // } else {
-    //   _showDialog(context, 'Please fix the errors in the form');
-    // }
+    if (formKey.currentState!.validate()) {
+      createItem();
+    } else {
+      _showDialog(context, 'Please fix the errors in the form');
+    }
     createItem();
   }
 
   Future<void> createItem() async {
-    // ProductModel body = ProductModel(
-    //   itemCode: itemCodeController.text,
-    //   barCode: barCodeController.text,
-    //   unitOfMeasure: unitController.text,
-    //   length: int.parse(UnitUtils.convertLength(
-    //       lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name)),
-    //   width: int.parse(UnitUtils.convertLength(
-    //       widthController.text, selectedWidthUnit, LengthUnitEnum.mm.name)),
-    //   height: int.parse(UnitUtils.convertLength(
-    //       heightController.text, selectedHeightUnit, LengthUnitEnum.mm.name)),
-    //   weight: int.parse(UnitUtils.convertWeight(
-    //       weightController.text, selectedWeightUnit, WeightUnitEnum.g.name)),
-    //   createBy: "User",
-    // );
-    // final response = await apiService.createItem(body);
-    // print("aaa ${response.productId}");
-    // uploadImage(response.productId ?? 0);
-    uploadImage(50);
+    ProductModel body = ProductModel(
+      itemCode: itemCodeController.text,
+      barCode: barCodeController.text,
+      unitOfMeasure: unitController.text,
+      length: int.parse(UnitUtils.convertLength(
+          lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name)),
+      width: int.parse(UnitUtils.convertLength(
+          widthController.text, selectedWidthUnit, LengthUnitEnum.mm.name)),
+      height: int.parse(UnitUtils.convertLength(
+          heightController.text, selectedHeightUnit, LengthUnitEnum.mm.name)),
+      weight: int.parse(UnitUtils.convertWeight(
+          weightController.text, selectedWeightUnit, WeightUnitEnum.g.name)),
+      createBy: "User",
+    );
+    final response = await apiService.createItem(body);
+    print("aaa ${response.productId}");
+    uploadImage(response.productId ?? 0);
+    // uploadImage(50);
   }
 
   Future<void> uploadImage(int productId) async {
