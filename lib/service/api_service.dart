@@ -172,7 +172,7 @@ class ApiService {
     debugPrint('Dio error: ${e.message}');
     final context = navigatorKey.currentContext;
     if (context != null) {
-      DialogHelper.showErrorDialog(
+      DialogHelper.showDioErrorDialog(
         context: context,
         statusCode: e.response?.statusCode,
         message: e.message ?? 'Unknown error occurred',

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_scanner_app/main.dart';
+import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 
 class Utils {
   // static String handleScanResult(String result, BuildContext context) {
@@ -20,10 +22,20 @@ class Utils {
     } else if (isValidTextFormat(result)) {
       return result = extractNumberFromText(result);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mã quét không hợp lệ.')),
-      );
+      showErrorDiablog("Mã quét không hợp lệ");
       return "";
+    }
+  }
+
+  static void showErrorDiablog(String message) {
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      DialogHelper.showErrorDialog(
+        context: context,
+        message: message,
+      );
+    } else {
+      debugPrint('Error: Unable to show dialog because context is null.');
     }
   }
 

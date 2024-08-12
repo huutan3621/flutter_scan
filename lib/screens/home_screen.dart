@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_scanner_app/controller/home_provider.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,6 @@ class HomeChild extends StatefulWidget {
 }
 
 class _HomeChildState extends State<HomeChild> {
-  // Initialize the provider
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -53,46 +53,21 @@ class _HomeChildState extends State<HomeChild> {
             scrollDirection: Axis.vertical,
             child: Column(
               children: [
-                // Button field
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
-                      // Expanded(
-                      //   child: GestureDetector(
-                      //     onTap: () async {
-                      //       var res = await Navigator.push(
-                      //         context,
-                      //         MaterialPageRoute(
-                      //           builder: (context) =>
-                      //               const SimpleBarcodeScannerPage(),
-                      //         ),
-                      //       );
-                      //       if (res is String) {
-                      //         value.handleScanResult(res, context);
-                      //       }
-                      //     },
-                      //     child: TextField(
-                      //       enabled: false,
-                      //       controller:
-                      //           value.textController, // Display result here
-                      //       decoration: const InputDecoration(
-                      //           hintText: 'Scan item...',
-                      //           border: OutlineInputBorder(),
-                      //           suffixIcon: Icon(Icons.qr_code)),
-                      //     ),
-                      //   ),
-                      // ),
                       Expanded(
                         child: TextFormField(
                           controller: value.textController,
                           keyboardType: TextInputType.none,
                           readOnly: true,
                           decoration: const InputDecoration(
-                              labelText: 'Barcode',
-                              hintText: 'Scan item...',
-                              border: OutlineInputBorder(),
-                              suffixIcon: Icon(Icons.qr_code)),
+                            labelText: 'Barcode',
+                            hintText: 'Scan item...',
+                            border: OutlineInputBorder(),
+                            suffixIcon: Icon(Icons.qr_code),
+                          ),
                           onTap: () async {
                             var res = await Navigator.push(
                               context,
@@ -118,14 +93,12 @@ class _HomeChildState extends State<HomeChild> {
                     ],
                   ),
                 ),
-                // Table Header and Content
                 Container(
                   color: Colors.orange,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Column(
                       children: [
-                        // Header Row
                         Table(
                           border: TableBorder.all(color: Colors.black),
                           columnWidths: const {
@@ -153,92 +126,127 @@ class _HomeChildState extends State<HomeChild> {
                             ),
                           ],
                         ),
-                        // Data Rows
-                        Container(
-                          color: Colors.white,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Table(
-                              border: TableBorder.all(color: Colors.black),
-                              columnWidths: const {
-                                0: FixedColumnWidth(100),
-                                1: FixedColumnWidth(100),
-                                2: FixedColumnWidth(100),
-                                3: FixedColumnWidth(100),
-                                4: FixedColumnWidth(100),
-                                5: FixedColumnWidth(100),
-                                6: FixedColumnWidth(100),
-                                7: FixedColumnWidth(150),
-                              },
-                              children: List.generate(value.dataList.length,
-                                  (rowIndex) {
-                                final List<ImageViewModel> images =
-                                    value.dataList[rowIndex].images ?? [];
-
-                                final hasMoreImages = images.length > 1;
-
-                                return TableRow(children: [
-                                  _buildDataCell(value
-                                      .dataList[rowIndex].itemCode
-                                      .toString()),
-                                  _buildDataCell(
-                                      value.dataList[rowIndex].barCode),
-                                  _buildDataCell(value
-                                      .dataList[rowIndex].unitOfMeasure
-                                      .toString()),
-                                  _buildDataCell(value.dataList[rowIndex].length
-                                      .toString()),
-                                  _buildDataCell(value.dataList[rowIndex].width
-                                      .toString()),
-                                  _buildDataCell(value.dataList[rowIndex].height
-                                      .toString()),
-                                  _buildDataCell(value.dataList[rowIndex].weight
-                                      .toString()),
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (images.isNotEmpty) {
-                                        value.showImagePreviewDialog(
-                                            context, images);
-                                      }
+                        value.scanResult.isNotEmpty
+                            ? Container(
+                                color: Colors.white,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Table(
+                                    border:
+                                        TableBorder.all(color: Colors.black),
+                                    columnWidths: const {
+                                      0: FixedColumnWidth(100),
+                                      1: FixedColumnWidth(100),
+                                      2: FixedColumnWidth(100),
+                                      3: FixedColumnWidth(100),
+                                      4: FixedColumnWidth(100),
+                                      5: FixedColumnWidth(100),
+                                      6: FixedColumnWidth(100),
+                                      7: FixedColumnWidth(150),
                                     },
-                                    child: Row(
-                                      children: [
-                                        if (images.isNotEmpty)
-                                          Flexible(
-                                            child: AspectRatio(
-                                              aspectRatio: 1,
-                                              child: Container(
-                                                margin: const EdgeInsets.only(
-                                                    right: 8.0),
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                  child: Image.network(
-                                                    images[0].url ?? "",
-                                                    fit: BoxFit.cover,
+                                    children: List.generate(
+                                        value.dataList.length, (rowIndex) {
+                                      final List<ImageViewModel> images =
+                                          value.dataList[rowIndex].images ?? [];
+
+                                      final hasMoreImages = images.length > 1;
+
+                                      return TableRow(children: [
+                                        _buildDataCell(value
+                                            .dataList[rowIndex].itemCode
+                                            .toString()),
+                                        _buildDataCell(
+                                            value.dataList[rowIndex].barCode),
+                                        _buildDataCell(value
+                                            .dataList[rowIndex].unitOfMeasure
+                                            .toString()),
+                                        _buildDataCell(value
+                                            .dataList[rowIndex].length
+                                            .toString()),
+                                        _buildDataCell(value
+                                            .dataList[rowIndex].width
+                                            .toString()),
+                                        _buildDataCell(value
+                                            .dataList[rowIndex].height
+                                            .toString()),
+                                        _buildDataCell(value
+                                            .dataList[rowIndex].weight
+                                            .toString()),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (images.isNotEmpty) {
+                                              value.showImagePreviewDialog(
+                                                  context, images);
+                                            }
+                                          },
+                                          child: Row(
+                                            children: [
+                                              if (images.isNotEmpty)
+                                                Flexible(
+                                                  child: AspectRatio(
+                                                    aspectRatio: 1,
+                                                    child: Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                        child: Image.network(
+                                                          images[0].url ?? "",
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ),
+                                              if (hasMoreImages)
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(horizontal: 8),
+                                                  child: Text(
+                                                    '+${images.length - 1} more',
+                                                    style: const TextStyle(
+                                                        fontSize: 16),
+                                                  ),
+                                                ),
+                                            ],
                                           ),
-                                        if (hasMoreImages)
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8),
-                                            child: Text(
-                                              '+${images.length - 1} more',
-                                              style:
-                                                  const TextStyle(fontSize: 16),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
+                                        ),
+                                      ]);
+                                    }),
                                   ),
-                                ]);
-                              }),
-                            ),
-                          ),
-                        ),
+                                ),
+                              )
+                            : Container(
+                                color: Colors.white,
+                                child: SingleChildScrollView(
+                                    child: Table(
+                                  border: TableBorder.all(color: Colors.black),
+                                  columnWidths: const {
+                                    0: FixedColumnWidth(850),
+                                  },
+                                  children: const [
+                                    TableRow(children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(16),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.error,
+                                                size: 24, color: Colors.red),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              "Không có giá trị",
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ])
+                                  ],
+                                )),
+                              ),
                       ],
                     ),
                   ),
@@ -266,7 +274,7 @@ class _HomeChildState extends State<HomeChild> {
 
   Widget _buildDataCell(String text) {
     return GestureDetector(
-      onTap: null, // No action for text cells
+      onTap: null,
       child: Container(
         padding: const EdgeInsets.all(8.0),
         child: Center(

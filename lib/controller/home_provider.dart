@@ -135,7 +135,7 @@ class HomeProvider extends ChangeNotifier {
           ),
         );
       } else {
-        DialogHelper.showErrorDialog(
+        DialogHelper.showDioErrorDialog(
           context: context,
           statusCode: null,
           message: 'No items available to pass to CreateItemScreen.',
@@ -157,7 +157,7 @@ class HomeProvider extends ChangeNotifier {
       );
     } else {
       // Trường hợp 3: dataList chứa tất cả đơn vị đo lường
-      DialogHelper.showErrorDialog(
+      DialogHelper.showDioErrorDialog(
         context: context,
         statusCode: null,
         message: 'All units of measure are already included.',
