@@ -37,20 +37,20 @@ class CreateItemProvider extends ChangeNotifier {
   String selectedHeightUnit = "";
   String selectedWeightUnit = "";
 
-  Future<void> init(
-      String? itemNumber, ProductModel? product, List<String>? unitList) async {
-    if (itemNumber == null) {
+  Future<void> init(String? itemNumber, ProductModel? product,
+      List<String>? unitListData) async {
+    if (itemNumber == null && product == null) {
       isItemCodeScanEnabled = true;
       notifyListeners();
     }
-    if (product != null && unitList != null) {
+    if (product != null) {
       itemCodeController.text = product.itemCode;
       if (product.barCode != "") {
         barCodeController.text = product.barCode;
         isBarcodeEnable = false;
       }
       unitController.text = product.unitOfMeasure;
-      unitList = unitList;
+      unitList = unitListData ?? [];
       notifyListeners();
     }
   }
