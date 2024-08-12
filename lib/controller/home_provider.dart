@@ -99,7 +99,7 @@ class HomeProvider extends ChangeNotifier {
             ),
           ),
         );
-        if (result == 'refresh') {
+        if (result == 'refresh' && scanResult.isNotEmpty) {
           await getProductsById(scanResult);
         }
       } else {
@@ -119,7 +119,7 @@ class HomeProvider extends ChangeNotifier {
           ),
         ),
       );
-      if (result == 'refresh') {
+      if (result == 'refresh' && scanResult.isNotEmpty) {
         await getProductsById(scanResult);
       }
     } else {
