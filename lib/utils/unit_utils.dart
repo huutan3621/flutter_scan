@@ -103,6 +103,8 @@ class UnitUtils {
         return convertKgToUnit(value, unitInputEnum, unitOutputEnum);
       case WeightUnitEnum.g:
         return convertGToUnit(value, unitInputEnum, unitOutputEnum);
+      case WeightUnitEnum.mg:
+        return convertMGToUnit(value, unitInputEnum, unitOutputEnum);
     }
   }
 
@@ -113,6 +115,8 @@ class UnitUtils {
         return value;
       case WeightUnitEnum.g:
         return value * 1000;
+      case WeightUnitEnum.mg:
+        return value * 1000 * 1000;
     }
   }
 
@@ -122,6 +126,20 @@ class UnitUtils {
       case WeightUnitEnum.kg:
         return (value / 1000).round();
       case WeightUnitEnum.g:
+        return value;
+      case WeightUnitEnum.mg:
+        return value * 1000;
+    }
+  }
+
+  static int convertMGToUnit(
+      int value, WeightUnitEnum unitInput, WeightUnitEnum unitOutput) {
+    switch (unitOutput) {
+      case WeightUnitEnum.kg:
+        return (value / (1000 * 1000)).round();
+      case WeightUnitEnum.g:
+        return (value / 1000).round();
+      case WeightUnitEnum.mg:
         return value;
     }
   }

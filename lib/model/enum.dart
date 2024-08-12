@@ -1,6 +1,6 @@
 enum LengthUnitEnum { m, dm, cm, mm }
 
-enum WeightUnitEnum { kg, g }
+enum WeightUnitEnum { kg, g, mg }
 
 enum UnitModel { VIEN, VI, THUNG, HOP }
 

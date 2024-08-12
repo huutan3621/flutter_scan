@@ -64,7 +64,7 @@ class HomeProvider extends ChangeNotifier {
     if (scanResult.isNotEmpty) {
       await checkNavigate(context);
     } else {
-      final result = await Navigator.push(
+      Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => const CreateItemScreen(
@@ -72,9 +72,6 @@ class HomeProvider extends ChangeNotifier {
           ),
         ),
       );
-      if (result == 'refresh') {
-        await getProductsById(scanResult);
-      }
     }
   }
 
