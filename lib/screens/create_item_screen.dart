@@ -72,13 +72,19 @@ class _CreateItemChildState extends State<CreateItemChild> {
 
                     TextFormField(
                       controller: value.barCodeController,
-                      enabled: false,
+                      enabled: value.isBarcodeEnable,
                       readOnly: true,
                       decoration: const InputDecoration(labelText: 'Barcode'),
                       onTap: () {
                         value.scanBarCode(context);
                       },
                       onChanged: (value) {},
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'This field is required';
+                        }
+                        return null;
+                      },
                     ),
 
                     DropdownMenu<String>(
@@ -145,7 +151,6 @@ class _CreateItemChildState extends State<CreateItemChild> {
                       label: "Weight",
                       unit: value.selectedWeightUnit,
                       callback: (previousValue, currentValue) {
-                        // setState(() {});
                         value.updateSelectedWeightUnit(
                             previousValue, currentValue);
                       },

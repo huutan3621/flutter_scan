@@ -16,20 +16,16 @@ class CreateItemProvider extends ChangeNotifier {
   final List<XFile> images = [];
   final List<ProductModel> listData = [];
   List<String> unitList = [];
-  late bool isBarcodeDisable = false;
+  late bool isBarcodeEnable = true;
 
   //controllers
   final TextEditingController itemCodeController = TextEditingController();
   final TextEditingController barCodeController = TextEditingController();
   final TextEditingController unitController = TextEditingController();
-  final TextEditingController lengthController =
-      TextEditingController(text: "0");
-  final TextEditingController widthController =
-      TextEditingController(text: "0");
-  final TextEditingController heightController =
-      TextEditingController(text: "0");
-  final TextEditingController weightController =
-      TextEditingController(text: "0");
+  final TextEditingController lengthController = TextEditingController();
+  final TextEditingController widthController = TextEditingController();
+  final TextEditingController heightController = TextEditingController();
+  final TextEditingController weightController = TextEditingController();
 
   List<String> lengthUnit = LengthUnitEnum.values.map((e) => e.name).toList();
   List<String> weightUnit = WeightUnitEnum.values.map((e) => e.name).toList();
@@ -44,7 +40,7 @@ class CreateItemProvider extends ChangeNotifier {
     itemCodeController.text = productModel?.itemCode ?? "";
     if (productModel?.barCode != "") {
       barCodeController.text = productModel?.barCode ?? "";
-      isBarcodeDisable = true;
+      isBarcodeEnable = false;
     }
     unitController.text = productModel?.unitOfMeasure ?? "";
     this.unitList = unitList ?? [];
@@ -97,7 +93,7 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   Future<void> scanBarCode(BuildContext context) async {
-    if (isBarcodeDisable = true) {
+    if (isBarcodeEnable == false) {
       _showDialog(
         context,
         'Barcode is already set. Scanning is not allowed.',
@@ -212,7 +208,6 @@ class CreateItemProvider extends ChangeNotifier {
     final response = await apiService.createItem(body);
     print("aaa ${response.productId}");
     uploadImage(response.productId ?? 0);
-    // uploadImage(21);
   }
 
   Future<void> uploadImage(int productId) async {

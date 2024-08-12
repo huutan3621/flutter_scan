@@ -99,6 +99,7 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
+        _handleSuccessDialog("Create successfully");
         return ProductModel.fromJson(response.data);
       } else {
         throw Exception(
