@@ -12,8 +12,7 @@ class SelectUnitTextFormField extends StatefulWidget {
   final TextInputType? keyboardType;
   final FormFieldValidator<String>? validator;
   final bool? isRequired;
-  final String? selectedUnit; // Added selectedUnit field
-
+  final String? selectedUnit;
   const SelectUnitTextFormField({
     super.key,
     required this.label,
@@ -26,7 +25,7 @@ class SelectUnitTextFormField extends StatefulWidget {
     this.keyboardType,
     this.validator,
     this.isRequired = false,
-    this.selectedUnit, // Added selectedUnit field
+    this.selectedUnit,
   });
 
   @override
@@ -42,7 +41,6 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
   void initState() {
     super.initState();
     list = widget.unitList ?? [];
-    // Ensure dropdownValue is a valid item in list or set to null
     dropdownValue = list.contains(widget.selectedUnit)
         ? widget.selectedUnit!
         : (list.isNotEmpty ? list.first : widget.unit);
@@ -73,7 +71,6 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
           }
         });
       } else {
-        // Show error or some feedback if the value is not an integer
         DialogHelper.showErrorDialog(
             context: context,
             message: 'Please enter a valid integer before changing the unit.');
@@ -86,8 +83,7 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
     return TextFormField(
       controller: widget.controller,
       obscureText: widget.obscureText,
-      keyboardType: widget.keyboardType ??
-          TextInputType.number, // Ensure only number input
+      keyboardType: widget.keyboardType ?? TextInputType.number,
       decoration: InputDecoration(
         suffixIcon: widget.iconButton ??
             DropdownButton<String>(
@@ -101,7 +97,7 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
                   child: Text(value),
                 );
               }).toList(),
-              underline: Container(), // Remove the underline
+              underline: Container(),
             ),
         labelText: widget.label,
       ),
@@ -110,7 +106,6 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
               if (value == null || value.isEmpty) {
                 return 'This field is required';
               }
-              // Check if value is a valid integer
               if (int.tryParse(value) == null) {
                 return 'Please enter a valid integer';
               }

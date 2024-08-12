@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomButton extends StatefulWidget {
   final Function() onTap;
   final String title;
-  final MaterialColor? btnColor;
+  final Color? btnColor;
   final TextStyle? txtStyle;
   final double? btnBorderRadius;
   final Color? txtColor;

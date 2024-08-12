@@ -5,6 +5,7 @@ import 'package:flutter_scanner_app/service/api_service.dart';
 import 'package:flutter_scanner_app/utils/unit_utils.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
+import 'package:flutter_scanner_app/widgets/image_review_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
@@ -34,6 +35,16 @@ class CreateItemProvider extends ChangeNotifier {
   // Available units
   List<String> lengthUnit = LengthUnitEnum.values.map((e) => e.name).toList();
   List<String> weightUnit = WeightUnitEnum.values.map((e) => e.name).toList();
+
+  //loading
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
+  void setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
 
   Future<void> init(String? itemNumber, ProductModel? product,
       List<String>? unitListData) async {
@@ -205,31 +216,60 @@ class CreateItemProvider extends ChangeNotifier {
     Navigator.pop(context);
   }
 
-  void onSubmit(BuildContext context) {
+  void removeImage(int index) {
+    images.removeAt(index);
+    notifyListeners();
+  }
+
+  void onSubmit(BuildContext context) async {
+    setLoading(true);
+
     if (formKey.currentState!.validate()) {
-      createItem();
+      try {
+        await createItem();
+
+        _showDialog(context, 'Item created successfully');
+      } catch (e) {
+        _showDialog(context, 'An error occurred while creating the item');
+      }
     } else {
       _showDialog(context, 'Please fix the errors in the form');
     }
+
+    setLoading(false);
   }
 
   Future<void> createItem() async {
+    int length = int.parse(UnitUtils.convertLength(
+        lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
+    int width = int.parse(UnitUtils.convertLength(
+        widthController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
+    int height = int.parse(UnitUtils.convertLength(
+        heightController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
+    int? weight;
+    if (weightController.text.isNotEmpty) {
+      weight = int.parse(UnitUtils.convertWeight(
+          weightController.text, selectedLengthUnit, WeightUnitEnum.g.name));
+    }
+
     ProductModel body = ProductModel(
       itemCode: itemCodeController.text,
       barCode: barCodeController.text,
       unitOfMeasure: selectedLengthUnit,
-      length: int.parse(UnitUtils.convertLength(
-          lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name)),
-      width: int.parse(UnitUtils.convertLength(
-          widthController.text, selectedLengthUnit, LengthUnitEnum.mm.name)),
-      height: int.parse(UnitUtils.convertLength(
-          heightController.text, selectedLengthUnit, LengthUnitEnum.mm.name)),
-      weight: int.parse(UnitUtils.convertWeight(
-          weightController.text, selectedLengthUnit, WeightUnitEnum.g.name)),
+      length: length,
+      width: width,
+      height: height,
+      weight: weight,
       createBy: "User",
     );
+
     final response = await apiService.createItem(body);
-    uploadImage(response.productId ?? 0);
+
+    if (images.isNotEmpty) {
+      if (response.productId != null) {
+        await uploadImage(response.productId!);
+      }
+    }
   }
 
   Future<void> uploadImage(int productId) async {
@@ -241,6 +281,15 @@ class CreateItemProvider extends ChangeNotifier {
     DialogHelper.showErrorDialog(
       context: context,
       message: message,
+    );
+  }
+
+  void showImagePreview(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ImagePreviewDialog(images: images);
+      },
     );
   }
 }

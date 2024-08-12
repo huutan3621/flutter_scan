@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class CustomValidateDropDown extends StatefulWidget {
   final String label;
-  final String? unit; // The currently selected unit
+  final String? unit;
   final List<String>? unitList;
   final Function(String)? onSelected;
   final bool isRequired;
-  final FormFieldValidator<String>? validator; // Validator function
+  final FormFieldValidator<String>? validator;
 
   const CustomValidateDropDown({
     super.key,
@@ -15,7 +15,7 @@ class CustomValidateDropDown extends StatefulWidget {
     required this.unitList,
     this.onSelected,
     this.isRequired = false,
-    this.validator, // Accept a validator function
+    this.validator,
   });
 
   @override
@@ -25,7 +25,7 @@ class CustomValidateDropDown extends StatefulWidget {
 class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
   late List<String> list;
   String? dropdownValue;
-  String? errorMessage; // To hold validation error messages
+  String? errorMessage;
 
   @override
   void initState() {
@@ -54,25 +54,21 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
     if (newValue != null) {
       setState(() {
         dropdownValue = newValue;
-        errorMessage = null; // Reset error when a valid option is selected
+        errorMessage = null;
         widget.onSelected?.call(newValue);
       });
     }
   }
 
   String? _validate() {
-    // Check if the dropdown is required
     if (widget.isRequired) {
-      // Check if list is empty
       if (list.isEmpty) {
         return 'No options available';
       }
-      // Check if no option is selected
       if (dropdownValue == null || dropdownValue!.isEmpty) {
         return 'This field is required';
       }
     }
-    // Use provided validator if available
     if (widget.validator != null) {
       return widget.validator!(dropdownValue);
     }

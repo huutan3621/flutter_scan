@@ -7,6 +7,7 @@ import 'package:flutter_scanner_app/utils/utils.dart';
 import 'package:flutter_scanner_app/widgets/custom_button.dart';
 
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
+import 'package:flutter_scanner_app/widgets/image_review_dialog.dart';
 
 class HomeProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
@@ -195,80 +196,11 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
-  void showImagePreviewDialog(
-      BuildContext context, List<ImageViewModel> images) {
-    final PageController pageController = PageController();
-
+  void showImagePreview(BuildContext context, List<ImageViewModel> images) {
     showDialog(
       context: context,
       builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: PageView.builder(
-                    controller: pageController,
-                    itemCount: images.length,
-                    itemBuilder: (context, index) {
-                      return ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(16),
-                            topRight: Radius.circular(16)),
-                        child: Image.network(
-                          images[index].url ?? "",
-                          fit: BoxFit.cover,
-                        ),
-                      );
-                    },
-                    onPageChanged: (index) {
-                      pageController.jumpToPage(index);
-                    },
-                  ),
-                ),
-                SizedBox(
-                  height: 80,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: images.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          pageController.jumpToPage(index);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.all(4),
-                          child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(16)),
-                            child: Image.network(
-                              images[index].url ?? "",
-                              width: 60,
-                              height: 60,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                CustomButton(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  title: "Close",
-                  margin: const EdgeInsets.all(16),
-                ),
-              ],
-            ),
-          ),
-        );
+        return ImagePreviewDialog(images: images);
       },
     );
   }

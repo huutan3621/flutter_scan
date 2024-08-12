@@ -256,9 +256,8 @@ class _HomeChildState extends State<HomeChild> {
                                               child: GestureDetector(
                                                 onTap: () {
                                                   if (images.isNotEmpty) {
-                                                    value
-                                                        .showImagePreviewDialog(
-                                                            context, images);
+                                                    value.showImagePreview(
+                                                        context, images);
                                                   }
                                                 },
                                                 child: Container(

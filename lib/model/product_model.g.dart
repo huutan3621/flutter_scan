@@ -33,7 +33,7 @@ ProductModel _$ProductModelFromJson(Map<String, dynamic> json) => ProductModel(
       length: (json['length'] as num).toInt(),
       width: (json['width'] as num).toInt(),
       height: (json['height'] as num).toInt(),
-      weight: (json['weight'] as num).toInt(),
+      weight: (json['weight'] as num?)?.toInt(),
       createDate: json['createDate'] == null
           ? null
           : DateTime.parse(json['createDate'] as String),

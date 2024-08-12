@@ -59,7 +59,7 @@ class ProductModel {
   @JsonKey(name: "height")
   final int height;
   @JsonKey(name: "weight")
-  final int weight;
+  final int? weight;
   @JsonKey(name: "createDate")
   final DateTime? createDate;
   @JsonKey(name: "createBy")
