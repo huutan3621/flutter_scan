@@ -4,6 +4,7 @@ class CustomButton extends StatefulWidget {
   final Function() onTap;
   final String title;
   final MaterialColor? btnColor;
+
   const CustomButton({
     super.key,
     required this.onTap,
@@ -20,18 +21,17 @@ class _CustomButtonState extends State<CustomButton> {
 
   @override
   void initState() {
-    isOnTapRun = true;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: isOnTapRun ? _startOnTap : null,
+      onTap: isOnTapRun ? null : _startOnTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
         decoration: BoxDecoration(
-          color: isOnTapRun ? Colors.grey : Colors.blue,
+          color: isOnTapRun ? Colors.grey : widget.btnColor,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Center(
@@ -49,7 +49,7 @@ class _CustomButtonState extends State<CustomButton> {
       isOnTapRun = true;
     });
 
-    widget.onTap;
+    widget.onTap();
 
     setState(() {
       isOnTapRun = false;

@@ -190,19 +190,19 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         child: const Text('Import Image'),
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () async {
+                      CustomButton(
+                        onTap: () async {
                           value.onSubmit(context);
                         },
-                        child: const Text('Submit'),
+                        title: 'Submit',
                       ),
-                      CustomButton(
-                          onTap: () {
-                            print("eeeeeeeeeeee");
-                            print("eeeeeeeeeeee");
-                            print("eeeeeeeeeeee");
-                          },
-                          title: "eeee"),
+                      // CustomButton(
+                      //     onTap: () {
+                      //       print("eeeeeeeeeeee");
+                      //       print("eeeeeeeeeeee");
+                      //       print("eeeeeeeeeeee");
+                      //     },
+                      //     title: "eeee"),
                     ],
                   ),
                 ),
