@@ -135,12 +135,8 @@ class HomeProvider extends ChangeNotifier {
           ),
         );
       } else {
-        DialogHelper.showDioErrorDialog(
-          context: context,
-          statusCode: null,
-          message: 'No items available to pass to CreateItemScreen.',
-          response: null,
-        );
+        DialogHelper.showErrorDialog(
+            context: context, message: "No available item.");
       }
     } else if (!containsAllUnits()) {
       // Trường hợp 2: dataList còn thiếu đơn vị đo lường nào
@@ -157,12 +153,8 @@ class HomeProvider extends ChangeNotifier {
       );
     } else {
       // Trường hợp 3: dataList chứa tất cả đơn vị đo lường
-      DialogHelper.showDioErrorDialog(
-        context: context,
-        statusCode: null,
-        message: 'All units of measure are already included.',
-        response: null,
-      );
+      DialogHelper.showErrorDialog(
+          context: context, message: "All item units are included");
     }
   }
 

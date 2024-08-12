@@ -22,7 +22,7 @@ class Utils {
     } else if (isValidTextFormat(result)) {
       return result = extractNumberFromText(result);
     } else {
-      showErrorDiablog("Mã quét không hợp lệ");
+      showErrorDiablog("Invalid scan code");
       return "";
     }
   }

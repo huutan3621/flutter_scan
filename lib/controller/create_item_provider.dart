@@ -41,7 +41,9 @@ class CreateItemProvider extends ChangeNotifier {
 
   Future<void> init(ProductModel? productModel, List<String>? unitList) async {
     itemCodeController.text = productModel?.itemCode ?? "";
-    barCodeController.text = productModel?.barCode ?? "";
+    if (productModel?.barCode != "") {
+      barCodeController.text = productModel?.barCode ?? "";
+    }
     unitController.text = productModel?.unitOfMeasure ?? "";
     this.unitList = unitList ?? [];
     notifyListeners();
