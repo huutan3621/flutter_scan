@@ -9,6 +9,8 @@ class SelectUnitTextFormField extends StatefulWidget {
   final TextEditingController? controller;
   final List<String>? unitList;
   final TextInputType? keyboardType;
+  final FormFieldValidator<String>? validator;
+  final bool? isRequired;
 
   const SelectUnitTextFormField({
     super.key,
@@ -20,6 +22,8 @@ class SelectUnitTextFormField extends StatefulWidget {
     this.controller,
     required this.unitList,
     this.keyboardType,
+    this.validator,
+    this.isRequired = false,
   });
 
   @override
@@ -69,6 +73,14 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
             ),
         labelText: widget.label,
       ),
+      validator: widget.isRequired == true
+          ? (value) {
+              if (value == null || value.isEmpty) {
+                return 'This field is required';
+              }
+              return null;
+            }
+          : widget.validator,
     );
   }
 }

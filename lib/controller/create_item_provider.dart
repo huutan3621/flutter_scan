@@ -9,12 +9,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class CreateItemProvider extends ChangeNotifier {
+  final ApiService apiService = ApiService();
+
   final formKey = GlobalKey<FormState>();
   final ImagePicker picker = ImagePicker();
   final List<XFile> images = [];
   final List<ProductModel> listData = [];
-
-  final ApiService apiService = ApiService();
+  List<String> unitList = [];
+  late bool isBarcodeDisable = false;
 
   //controllers
   final TextEditingController itemCodeController = TextEditingController();
@@ -32,17 +34,17 @@ class CreateItemProvider extends ChangeNotifier {
   List<String> lengthUnit = LengthUnitEnum.values.map((e) => e.name).toList();
   List<String> weightUnit = WeightUnitEnum.values.map((e) => e.name).toList();
 
+  //selected unit
   String selectedLengthUnit = "";
   String selectedWidthUnit = "";
   String selectedHeightUnit = "";
   String selectedWeightUnit = "";
 
-  List<String> unitList = [];
-
   Future<void> init(ProductModel? productModel, List<String>? unitList) async {
     itemCodeController.text = productModel?.itemCode ?? "";
     if (productModel?.barCode != "") {
       barCodeController.text = productModel?.barCode ?? "";
+      isBarcodeDisable = true;
     }
     unitController.text = productModel?.unitOfMeasure ?? "";
     this.unitList = unitList ?? [];
@@ -86,14 +88,6 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   Future<void> scanItemCode(BuildContext context) async {
-    if (itemCodeController.text.isNotEmpty) {
-      _showDialog(
-        context,
-        'Item Code is already set. Scanning is not allowed.',
-      );
-      return;
-    }
-
     var res = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -107,7 +101,7 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   Future<void> scanBarCode(BuildContext context) async {
-    if (barCodeController.text.isNotEmpty) {
+    if (isBarcodeDisable = true) {
       _showDialog(
         context,
         'Barcode is already set. Scanning is not allowed.',
@@ -196,6 +190,14 @@ class CreateItemProvider extends ChangeNotifier {
     Navigator.pop(context);
   }
 
+  void validateRequiredField(BuildContext context) {
+    if (formKey.currentState!.validate()) {
+      createItem();
+    } else {
+      _showDialog(context, 'Please fix the errors in the form');
+    }
+  }
+
   Future<void> createItem() async {
     ProductModel body = ProductModel(
       itemCode: itemCodeController.text,
@@ -219,7 +221,7 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   void _showDialog(BuildContext context, String message) {
-    DialogHelper.showSuccessDialog(
+    DialogHelper.showErrorDialog(
       context: context,
       message: message,
     );

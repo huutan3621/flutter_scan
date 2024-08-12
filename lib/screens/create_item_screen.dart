@@ -59,25 +59,26 @@ class _CreateItemChildState extends State<CreateItemChild> {
                 key: value.formKey,
                 child: Column(
                   children: [
-                    GestureDetector(
-                      onTap: () async {
-                        value.scanItemCode(context);
+                    TextFormField(
+                      controller: value.itemCodeController,
+                      enabled: false,
+                      readOnly: true,
+                      decoration: const InputDecoration(labelText: 'Item Code'),
+                      onTap: () {
+                        // value.scanItemCode(context);
                       },
-                      child: TextFormField(
-                          controller: value.itemCodeController,
-                          enabled: false,
-                          decoration:
-                              const InputDecoration(labelText: 'Item Code')),
+                      onChanged: (value) {},
                     ),
-                    GestureDetector(
-                      onTap: () async {
+
+                    TextFormField(
+                      controller: value.barCodeController,
+                      enabled: false,
+                      readOnly: true,
+                      decoration: const InputDecoration(labelText: 'Barcode'),
+                      onTap: () {
                         value.scanBarCode(context);
                       },
-                      child: TextFormField(
-                          controller: value.barCodeController,
-                          enabled: false,
-                          decoration:
-                              const InputDecoration(labelText: 'Barcode')),
+                      onChanged: (value) {},
                     ),
 
                     DropdownMenu<String>(
@@ -110,6 +111,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                             previousValue, currentValue);
                       },
                       unitList: value.lengthUnit,
+                      isRequired: true,
                     ),
                     //width
                     SelectUnitTextFormField(
@@ -122,6 +124,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         // setState(() {});
                       },
                       unitList: value.lengthUnit,
+                      isRequired: true,
                     ),
                     //height
                     SelectUnitTextFormField(
@@ -134,6 +137,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                             previousValue, currentValue);
                       },
                       unitList: value.lengthUnit,
+                      isRequired: true,
                     ),
                     //weight
                     SelectUnitTextFormField(
@@ -171,10 +175,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () async {
-                        // if (value.formKey.currentState!.validate()) {
-                        //   // Handle form submission
-                        // }
-                        value.createItem();
+                        
                       },
                       child: const Text('Submit'),
                     ),
