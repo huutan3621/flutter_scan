@@ -97,7 +97,7 @@ class HomeProvider extends ChangeNotifier {
             productModel: dataList[0].copyWith(
               unitOfMeasure: getMissingUnits().first,
             ),
-            unitList: unitList,
+            unitList: getMissingUnits(),
           ),
         ),
       );
