@@ -34,11 +34,7 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
   @override
   void initState() {
     super.initState();
-    list = widget.itemList ?? [];
-    dropdownValue =
-        (widget.selectedItem != null && list.contains(widget.selectedItem))
-            ? widget.selectedItem
-            : (list.isNotEmpty ? list.first : null);
+    _updateDropdownValue();
   }
 
   @override
@@ -47,14 +43,17 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
     if (widget.itemList != oldWidget.itemList ||
         widget.selectedItem != oldWidget.selectedItem ||
         widget.disabledItemList != oldWidget.disabledItemList) {
-      setState(() {
-        list = widget.itemList ?? [];
-        dropdownValue =
-            (widget.selectedItem != null && list.contains(widget.selectedItem))
-                ? widget.selectedItem
-                : (list.isNotEmpty ? list.first : null);
-      });
+      _updateDropdownValue();
     }
+  }
+
+  void _updateDropdownValue() {
+    list = widget.itemList ?? [];
+    dropdownValue = (widget.selectedItem != null &&
+            widget.selectedItem!.isNotEmpty &&
+            list.contains(widget.selectedItem))
+        ? widget.selectedItem
+        : (list.isNotEmpty ? list.first : null);
   }
 
   void _onDropdownChanged(String? newValue) {
@@ -91,19 +90,21 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.label,
-          ),
+          Text(widget.label),
           Container(
             decoration: BoxDecoration(
               border: Border.all(
-                  color:
-                      isError && !widget.isLoading ? Colors.red : Colors.grey),
+                color: isError && !widget.isLoading ? Colors.red : Colors.grey,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: DropdownButton<String>(
-              value: list.isNotEmpty ? dropdownValue : null,
+              value: widget.selectedItem != ""
+                  ? list.isNotEmpty
+                      ? dropdownValue
+                      : null
+                  : null,
               hint: Text(widget.label),
               icon: const Icon(Icons.arrow_downward),
               elevation: 16,
@@ -122,10 +123,13 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
                     widget.disabledItemList?.contains(value) ?? false;
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value,
-                      style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          color: isDisabled ? Colors.grey : Colors.black)),
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      color: isDisabled ? Colors.grey : Colors.black,
+                    ),
+                  ),
                 );
               }).toList(),
               underline: Container(),
