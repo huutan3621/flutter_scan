@@ -78,7 +78,7 @@ class ProductModel {
     required this.length,
     required this.width,
     required this.height,
-    required this.weight,
+    this.weight,
     this.createDate,
     required this.createBy,
     this.images,

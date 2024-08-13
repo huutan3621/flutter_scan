@@ -276,47 +276,46 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   Future<bool> createItem() async {
-    late bool isSuccess = false;
-    int length = int.parse(UnitUtils.convertLength(
-        lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
-    int width = int.parse(UnitUtils.convertLength(
-        widthController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
-    int height = int.parse(UnitUtils.convertLength(
-        heightController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
-    int? weight;
-    if (weightController.text.isNotEmpty) {
-      weight = int.parse(UnitUtils.convertWeight(
-          weightController.text, selectedLengthUnit, WeightUnitEnum.g.name));
-    } else {
-      weight == null;
-    }
+    try {
+      // Convert and parse dimensions
+      final length = int.parse(UnitUtils.convertLength(
+          lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
+      final width = int.parse(UnitUtils.convertLength(
+          widthController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
+      final height = int.parse(UnitUtils.convertLength(
+          heightController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
 
-    ProductModel body = ProductModel(
-      itemCode: itemCodeController.text,
-      barCode: barCodeController.text,
-      unitOfMeasure: selectedProductUnit,
-      length: length,
-      width: width,
-      height: height,
-      weight: weight,
-      createDate: DateTime.now(),
-      createBy: "App Mobile",
-    );
+      final weight = weightController.text.isNotEmpty
+          ? int.parse(UnitUtils.convertWeight(
+              weightController.text, selectedLengthUnit, WeightUnitEnum.g.name))
+          : 0;
 
-    final response = await apiService.createItem(body);
+      final body = ProductModel(
+        itemCode: itemCodeController.text,
+        barCode: barCodeController.text,
+        unitOfMeasure: selectedProductUnit,
+        length: length,
+        width: width,
+        height: height,
+        weight: weight,
+        createDate: DateTime.now(),
+        createBy: "App Mobile",
+      );
 
-    if (images.isEmpty && response.productId != null) {
-      isSuccess = true;
-      return isSuccess;
-    }
+      final response = await apiService.createItem(body);
 
-    if (images.isNotEmpty) {
       if (response.productId != null) {
-        isSuccess = await uploadImage(response.productId!);
-        return isSuccess;
+        if (images.isNotEmpty) {
+          return await uploadImage(response.productId!);
+        }
+        return true;
       }
+
+      return false;
+    } catch (e) {
+      debugPrint('Error creating item: $e');
+      return false;
     }
-    return isSuccess;
   }
 
   Future<bool> uploadImage(int productId) async {
