@@ -211,4 +211,49 @@ class HomeProvider extends ChangeNotifier {
       },
     );
   }
+
+  showAlertDialog(BuildContext context, String itemCode, String barCode,
+      String unitOfMeasure) {
+    Widget cancelButton = CustomButton(
+      title: "Cancel",
+      btnColor: Colors.blue[400],
+      onTap: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = CustomButton(
+      title: "Confirm",
+      btnColor: Colors.red[400],
+      onTap: () {
+        blockData(itemCode, barCode, unitOfMeasure);
+        Navigator.of(context).pop();
+      },
+    );
+    AlertDialog alert = AlertDialog(
+      title: const Text("Delete"),
+      content: const Text("Would you like to Delete the item"),
+      actions: [
+        continueButton,
+        const SizedBox(
+          height: 16,
+        ),
+        cancelButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future<void> blockData(
+      String itemCode, String barCode, String unitOfMeasure) async {
+    final result = await apiService.blockData(itemCode, barCode, unitOfMeasure);
+    if (result) {
+      await onRefresh();
+    }
+  }
 }

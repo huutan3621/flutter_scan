@@ -125,6 +125,11 @@ class _HomeChildState extends State<HomeChild> {
                           DataColumn(
                             label: Container(
                               padding: const EdgeInsets.all(8.0),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
                               child: const Text('Item Code',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
@@ -192,6 +197,9 @@ class _HomeChildState extends State<HomeChild> {
                                 DataRow(
                                   cells: [
                                     DataCell(
+                                      Container(),
+                                    ),
+                                    DataCell(
                                       Container(
                                         padding: const EdgeInsets.all(16),
                                         child: const Center(
@@ -218,6 +226,31 @@ class _HomeChildState extends State<HomeChild> {
 
                                   return DataRow(
                                     cells: [
+                                      DataCell(Container(
+                                        margin: const EdgeInsets.only(right: 8),
+                                        child: GestureDetector(
+                                            onTap: () {
+                                              value.showAlertDialog(
+                                                  context,
+                                                  value.dataList[rowIndex]
+                                                      .itemCode,
+                                                  value.dataList[rowIndex]
+                                                      .barCode,
+                                                  value.dataList[rowIndex]
+                                                      .unitOfMeasure);
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red[400],
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.delete,
+                                                color: Colors.white,
+                                              ),
+                                            )),
+                                      )),
                                       DataCell(Container(
                                         child: Center(
                                             child: Text(value

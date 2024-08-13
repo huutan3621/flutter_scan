@@ -190,6 +190,40 @@ class ApiService {
     }
   }
 
+  Future<bool> blockData(
+      String itemCode, String barCode, String unitOfMeasure) async {
+    final dio = Dio();
+    final url = '$baseUrl/api/ScanProduct/block-scan-product-data';
+
+    try {
+      final response = await dio.post(
+        url,
+        queryParameters: {
+          'itemCode': itemCode,
+          'barCode': barCode,
+          'unitOfMeasure': unitOfMeasure,
+        },
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
+      if (response.statusCode == 200) {
+        _handleSuccessDialog("Delete successfully");
+        return true;
+      } else {
+        debugPrint('Failed to delete. Status code: ${response.statusCode}');
+        debugPrint('Response body: ${response.data}');
+        return false;
+      }
+    } on DioException catch (e) {
+      _handleErrorDialog(e.response?.data);
+      rethrow;
+    } catch (e) {
+      debugPrint('Error updating product image: $e');
+      rethrow;
+    }
+  }
+
   void _handleSuccessDialog(String message) {
     final context = navigatorKey.currentContext;
     if (context != null) {
