@@ -245,7 +245,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         );
                       },
                       title: 'Import Image',
-                      btnColor: Colors.blue[200],
+                      btnColor: Colors.green[300],
                     ),
                     CustomButton(
                       onTap: () async {
@@ -279,7 +279,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
               value.chooseImageFromGallery(context);
             },
             title: 'Pick Image',
-            btnColor: Colors.blue[200],
+            btnColor: Colors.green[300],
           ),
           const SizedBox(height: 16),
           CustomButton(
