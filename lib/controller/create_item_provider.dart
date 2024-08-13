@@ -145,8 +145,11 @@ class CreateItemProvider extends ChangeNotifier {
       ),
     );
     if (res is String) {
-      itemCodeController.text = handleScanResult(res, context);
-      await getUnitById(res);
+      final scanValue = handleScanResult(res, context);
+      itemCodeController.text = scanValue;
+      if (scanValue != "") {
+        await getUnitById(scanValue);
+      }
       notifyListeners();
     }
   }
@@ -167,7 +170,12 @@ class CreateItemProvider extends ChangeNotifier {
       ),
     );
     if (res is String) {
-      barCodeController.text = res;
+      final isValidCode = Utils.isValidBarcode(res);
+      if (isValidCode) {
+        barCodeController.text = res;
+      } else {
+        _showDialog(context, "Invalid scan code");
+      }
       notifyListeners();
     }
   }

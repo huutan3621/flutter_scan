@@ -22,12 +22,12 @@ class Utils {
     } else if (isValidTextFormat(result)) {
       return result = extractNumberFromText(result);
     } else {
-      showErrorDiablog("Invalid scan code");
+      showErrorDialog("Invalid scan code");
       return "";
     }
   }
 
-  static void showErrorDiablog(String message) {
+  static void showErrorDialog(String message) {
     final context = navigatorKey.currentContext;
     if (context != null) {
       DialogHelper.showErrorDialog(
@@ -45,7 +45,7 @@ class Utils {
   }
 
   static bool isValidBarcode(String code) {
-    final regex = RegExp(r'^\d{13}$');
+    final regex = RegExp(r'^\d{11,13}$'); // 11 - 13 digits in barcode
     return regex.hasMatch(code);
   }
 

@@ -18,7 +18,7 @@ class CustomLoadingOverlay extends StatelessWidget {
         if (isLoading)
           Positioned.fill(
             child: Container(
-              // color: Colors.black54,
+              color: Colors.black54,
               child: const Center(
                 child: CircularProgressIndicator(),
               ),
