@@ -292,15 +292,15 @@ class CreateItemProvider extends ChangeNotifier {
   void onSubmit(BuildContext context) async {
     setLoading(true);
 
-    if (formKey.currentState!.validate()) {
+    if (formKey.currentState!.validate() && selectedProductUnit != "") {
       try {
         final bool = await createItem();
         if (bool == true) {
-          _showDialog(context, 'Item created successfully');
+          Navigator.pop(context, 'refresh');
         }
       } catch (e) {}
     } else {
-      _showDialog(context, 'Please fix the errors in the form');
+      _showDialog(context, 'Error. Please check the form again');
     }
     setLoading(false);
   }

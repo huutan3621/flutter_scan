@@ -104,9 +104,8 @@ class ApiService {
             'Failed to create item. Status code: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      final Map<String, dynamic> data = e.response?.data;
-      String title = data['data'][0]['title'];
-      _handleErrorDialog(title);
+      _handleErrorDialog(
+          "Error. Please try again: ${e.response?.statusMessage}");
       rethrow;
     } catch (e) {
       debugPrint('Error creating item: $e');

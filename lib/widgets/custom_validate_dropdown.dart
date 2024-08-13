@@ -94,17 +94,13 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
           Container(
             decoration: BoxDecoration(
               border: Border.all(
-                color: isError && !widget.isLoading ? Colors.red : Colors.grey,
+                color: isError ? Colors.red : Colors.grey,
               ),
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: DropdownButton<String>(
-              value: widget.selectedItem != ""
-                  ? list.isNotEmpty
-                      ? dropdownValue
-                      : null
-                  : null,
+              value: dropdownValue, // Ensure dropdownValue is used
               hint: Text(widget.label),
               icon: const Icon(Icons.arrow_downward),
               elevation: 16,
@@ -135,7 +131,7 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
               underline: Container(),
             ),
           ),
-          if (isError && !widget.isLoading)
+          if (isError)
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(

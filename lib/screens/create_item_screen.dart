@@ -125,7 +125,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                             value.chooseUnit(p0);
                           },
                           validator: (selectedUnit) {
-                            if (value.unitList.isEmpty ?? true) {
+                            if (value.unitList.isEmpty) {
                               return 'No options available';
                             }
                             if (selectedUnit == null || selectedUnit.isEmpty) {
@@ -133,7 +133,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                             }
                             return null;
                           },
-                          isLoading: value.isLoading,
+                          // isLoading: value.isLoading,
                         ),
                         SelectUnitTextFormField(
                           controller: value.lengthController,
