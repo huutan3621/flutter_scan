@@ -325,8 +325,8 @@ class CreateItemProvider extends ChangeNotifier {
           heightController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
 
       final weight = weightController.text.isNotEmpty
-          ? int.parse(UnitUtils.convertWeight(
-              weightController.text, selectedLengthUnit, WeightUnitEnum.g.name))
+          ? int.parse(UnitUtils.convertWeight(weightController.text,
+              selectedLengthUnit, WeightUnitEnum.mg.name))
           : 0;
 
       final body = ProductModel(
