@@ -2,20 +2,24 @@ import 'package:flutter/material.dart';
 
 class CustomValidateDropDown extends StatefulWidget {
   final String label;
-  final String? unit;
-  final List<String>? unitList;
+  final String? selectedItem;
+  final List<String>? itemList;
   final Function(String)? onSelected;
   final bool isRequired;
   final FormFieldValidator<String>? validator;
+  final List<String>? disabledItemList;
+  final bool isLoading;
 
   const CustomValidateDropDown({
     super.key,
     required this.label,
-    this.unit,
-    required this.unitList,
+    this.selectedItem,
+    required this.itemList,
     this.onSelected,
     this.isRequired = false,
     this.validator,
+    this.disabledItemList,
+    this.isLoading = false,
   });
 
   @override
@@ -30,22 +34,25 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
   @override
   void initState() {
     super.initState();
-    list = widget.unitList ?? [];
-    dropdownValue = (widget.unit != null && list.contains(widget.unit))
-        ? widget.unit
-        : (list.isNotEmpty ? list.first : null);
+    list = widget.itemList ?? [];
+    dropdownValue =
+        (widget.selectedItem != null && list.contains(widget.selectedItem))
+            ? widget.selectedItem
+            : (list.isNotEmpty ? list.first : null);
   }
 
   @override
   void didUpdateWidget(covariant CustomValidateDropDown oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.unitList != oldWidget.unitList ||
-        widget.unit != oldWidget.unit) {
+    if (widget.itemList != oldWidget.itemList ||
+        widget.selectedItem != oldWidget.selectedItem ||
+        widget.disabledItemList != oldWidget.disabledItemList) {
       setState(() {
-        list = widget.unitList ?? [];
-        dropdownValue = (widget.unit != null && list.contains(widget.unit))
-            ? widget.unit
-            : (list.isNotEmpty ? list.first : null);
+        list = widget.itemList ?? [];
+        dropdownValue =
+            (widget.selectedItem != null && list.contains(widget.selectedItem))
+                ? widget.selectedItem
+                : (list.isNotEmpty ? list.first : null);
       });
     }
   }
@@ -84,10 +91,14 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.label, style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            widget.label,
+          ),
           Container(
             decoration: BoxDecoration(
-              border: Border.all(color: isError ? Colors.red : Colors.grey),
+              border: Border.all(
+                  color:
+                      isError && !widget.isLoading ? Colors.red : Colors.grey),
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -97,17 +108,30 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
               icon: const Icon(Icons.arrow_downward),
               elevation: 16,
               isExpanded: true,
-              onChanged: list.isNotEmpty ? _onDropdownChanged : null,
+              onChanged: list.isNotEmpty
+                  ? (value) {
+                      if (value != null &&
+                          !(widget.disabledItemList?.contains(value) ??
+                              false)) {
+                        _onDropdownChanged(value);
+                      }
+                    }
+                  : null,
               items: list.map<DropdownMenuItem<String>>((String value) {
+                final isDisabled =
+                    widget.disabledItemList?.contains(value) ?? false;
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(value,
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: isDisabled ? Colors.grey : Colors.black)),
                 );
               }).toList(),
               underline: Container(),
             ),
           ),
-          if (isError)
+          if (isError && !widget.isLoading)
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(

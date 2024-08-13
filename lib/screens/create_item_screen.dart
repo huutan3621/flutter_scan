@@ -117,8 +117,9 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         ),
                         CustomValidateDropDown(
                           label: "Unit",
-                          unit: value.selectedProductUnit,
-                          unitList: value.unitList,
+                          selectedItem: value.selectedProductUnit,
+                          itemList: value.unitList,
+                          disabledItemList: value.disableUnitList ?? [],
                           isRequired: true,
                           onSelected: (p0) {
                             value.chooseUnit(p0);
@@ -130,8 +131,9 @@ class _CreateItemChildState extends State<CreateItemChild> {
                             if (selectedUnit == null || selectedUnit.isEmpty) {
                               return 'This field is required';
                             }
-                            return null; // No validation errors
+                            return null;
                           },
+                          isLoading: value.isLoading,
                         ),
                         SelectUnitTextFormField(
                           controller: value.lengthController,

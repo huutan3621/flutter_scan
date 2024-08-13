@@ -65,7 +65,7 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
       final value = widget.controller?.text ?? '';
       if (value.isEmpty || int.tryParse(value) != null) {
         setState(() {
-          dropdownValue = newValue;
+          dropdownValue = widget.selectedUnit ?? "";
           if (widget.callback != null) {
             widget.callback!(dropdownValue, newValue);
           }

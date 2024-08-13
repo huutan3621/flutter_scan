@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_scanner_app/model/enum.dart';
+import 'package:flutter_scanner_app/utils/enum.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/service/api_service.dart';
 import 'package:flutter_scanner_app/utils/unit_utils.dart';
@@ -14,8 +14,8 @@ class CreateItemProvider extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
   final ImagePicker picker = ImagePicker();
   final List<XFile> images = [];
-  final List<ProductModel> listData = [];
-  List<String> unitList = [];
+  late List<String> disableUnitList = [];
+  late List<String> unitList = [];
   late bool isBarcodeEnable = true;
   late bool isItemCodeScanEnabled = false;
 
@@ -48,10 +48,12 @@ class CreateItemProvider extends ChangeNotifier {
 
   Future<void> init(String? itemNumber, ProductModel? product,
       List<String>? unitListData) async {
+    //create completely new
     if (itemNumber == null && product == null) {
       isItemCodeScanEnabled = true;
       notifyListeners();
     }
+    //check product cases
     if (product != null) {
       itemCodeController.text = product.itemCode;
       if (product.barCode != "") {
@@ -59,22 +61,58 @@ class CreateItemProvider extends ChangeNotifier {
         isBarcodeEnable = false;
       }
       selectedProductUnit = product.unitOfMeasure;
-      selectedLengthUnit = lengthUnit.first;
-      selectedWeightUnit = weightUnit.first;
-      unitList = unitListData ?? [];
+      selectedLengthUnit = lengthUnit.last;
+      selectedWeightUnit = weightUnit.last;
       notifyListeners();
     }
-    selectedLengthUnit = lengthUnit.first;
-    selectedWeightUnit = weightUnit.first;
+    //have item number but create new
+    if (itemNumber != null) {
+      await getUnitById(itemNumber);
+      await getDisableUnit(itemNumber);
+    }
+    //get unit
+    disableUnitList = unitListData ?? [];
+    selectedLengthUnit = lengthUnit.last;
+    selectedWeightUnit = weightUnit.last;
     notifyListeners();
   }
 
   Future<void> getUnitById(String itemNumber) async {
+    setLoading(true);
     unitList = await apiService.getUnitById(itemNumber);
     if (unitList.isNotEmpty) {
-      selectedLengthUnit = unitList.first;
+      selectedProductUnit = unitList.first;
     }
+    if (isItemCodeScanEnabled) {
+      await getDisableUnit(itemNumber);
+    }
+    setLoading(false);
     notifyListeners();
+  }
+
+  Future<List<ProductModel>> getProductsById(String itemNumber) async {
+    return await apiService.getProductsById(itemNumber);
+  }
+
+  Future<void> getDisableUnit(String itemNumber) async {
+    setLoading(true);
+    final listData = await getProductsById(itemNumber);
+    disableUnitList = getSelectedUnits(listData);
+    selectedProductUnit = getMissingUnits(listData).first;
+    setLoading(false);
+    notifyListeners();
+  }
+
+  List<String> getMissingUnits(List<ProductModel> listData) {
+    final unitsInList = listData.map((item) => item.unitOfMeasure).toSet();
+    final allUnits = unitList.toSet();
+    return allUnits.difference(unitsInList).toList();
+  }
+
+  List<String> getSelectedUnits(List<ProductModel> listData) {
+    final unitsInList = listData.map((item) => item.unitOfMeasure).toSet();
+    final allUnits = unitList.toSet();
+    return unitsInList.intersection(allUnits).toList();
   }
 
   String handleScanResult(String result, BuildContext context) {
@@ -93,9 +131,9 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   void updateSelectedWeightUnit(String previousValue, String currentValue) {
-    selectedLengthUnit = currentValue;
+    selectedWeightUnit = currentValue;
     weightController.text = UnitUtils.convertWeight(
-        weightController.text, previousValue, selectedLengthUnit);
+        weightController.text, previousValue, selectedWeightUnit);
     notifyListeners();
   }
 
@@ -226,20 +264,19 @@ class CreateItemProvider extends ChangeNotifier {
 
     if (formKey.currentState!.validate()) {
       try {
-        await createItem();
-
-        _showDialog(context, 'Item created successfully');
-      } catch (e) {
-        _showDialog(context, 'An error occurred while creating the item');
-      }
+        final bool = await createItem();
+        if (bool == true) {
+          _showDialog(context, 'Item created successfully');
+        }
+      } catch (e) {}
     } else {
       _showDialog(context, 'Please fix the errors in the form');
     }
-
     setLoading(false);
   }
 
-  Future<void> createItem() async {
+  Future<bool> createItem() async {
+    late bool isSuccess = false;
     int length = int.parse(UnitUtils.convertLength(
         lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
     int width = int.parse(UnitUtils.convertLength(
@@ -255,26 +292,33 @@ class CreateItemProvider extends ChangeNotifier {
     ProductModel body = ProductModel(
       itemCode: itemCodeController.text,
       barCode: barCodeController.text,
-      unitOfMeasure: selectedLengthUnit,
+      unitOfMeasure: selectedProductUnit,
       length: length,
       width: width,
       height: height,
       weight: weight,
-      createBy: "User",
+      createDate: DateTime.now(),
+      createBy: "App Mobile",
     );
 
     final response = await apiService.createItem(body);
 
+    if (images.isEmpty && response.productId != null) {
+      isSuccess = true;
+      return isSuccess;
+    }
+
     if (images.isNotEmpty) {
       if (response.productId != null) {
-        await uploadImage(response.productId!);
+        isSuccess = await uploadImage(response.productId!);
+        return isSuccess;
       }
     }
+    return isSuccess;
   }
 
-  Future<void> uploadImage(int productId) async {
-    final response = apiService.updateProductImage(productId, images);
-    print(response);
+  Future<bool> uploadImage(int productId) async {
+    return await apiService.updateProductImage(productId, images);
   }
 
   void _showDialog(BuildContext context, String message) {

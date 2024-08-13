@@ -84,9 +84,7 @@ class HomeProvider extends ChangeNotifier {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const CreateItemScreen(
-            unitList: [],
-          ),
+          builder: (context) => const CreateItemScreen(),
         ),
       );
     }
@@ -112,7 +110,7 @@ class HomeProvider extends ChangeNotifier {
                 createDate: DateTime.now(),
                 images: [],
               ),
-              unitList: unitList,
+              itemCode: scanResult,
             ),
           ),
         );
@@ -133,6 +131,7 @@ class HomeProvider extends ChangeNotifier {
               unitOfMeasure: getMissingUnits().first,
             ),
             unitList: getSelectedUnits(),
+            itemCode: scanResult,
           ),
         ),
       );
@@ -166,7 +165,7 @@ class HomeProvider extends ChangeNotifier {
                 createDate: DateTime.now(),
                 images: [],
               ),
-              unitList: unitList,
+              itemCode: scanResult,
             ),
           ),
         );
@@ -187,6 +186,7 @@ class HomeProvider extends ChangeNotifier {
               unitOfMeasure: getMissingUnits().first,
             ),
             unitList: getSelectedUnits(),
+            itemCode: scanResult,
           ),
         ),
       );

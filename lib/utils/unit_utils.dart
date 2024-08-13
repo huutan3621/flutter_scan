@@ -1,4 +1,4 @@
-import 'package:flutter_scanner_app/model/enum.dart';
+import 'package:flutter_scanner_app/utils/enum.dart';
 import 'package:collection/collection.dart';
 
 class UnitUtils {

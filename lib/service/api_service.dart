@@ -7,11 +7,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_scanner_app/model/product_model.dart'; // Adjust the import according to your project structure
 
 class ApiService {
-  final String baseUrl;
+  final String baseUrl = 'https://scanproduct.trungsoncare.com';
   final Dio dio;
 
   ApiService({
-    this.baseUrl = 'https://scanproduct.trungsoncare.com/',
     Dio? dio,
   }) : dio = dio ?? Dio();
 
@@ -92,22 +91,28 @@ class ApiService {
 
   Future<ProductModel> createItem(ProductModel body) async {
     try {
+      final requestPayload = body.toJson();
+      print('Sending request with payload: $requestPayload');
+
       final response = await dio.post(
         '$baseUrl/api/ScanProduct/create-scan-product-data',
-        data: body.toJson(),
+        data: requestPayload,
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
 
       if (response.statusCode == 200) {
         return ProductModel.fromJson(response.data);
       } else {
+        final errorMessage = response.data['message'] ?? 'Unknown error';
         throw Exception(
-            'Failed to create item. Status code: ${response.statusCode}');
+            'Failed to create item. Status code: ${response.statusCode}, Message: $errorMessage');
       }
     } on DioException catch (e) {
+      print('DioException: ${e.message}');
       _handleErrorDialog(e.response?.data);
       rethrow;
     } catch (e) {
+      print('Exception: $e');
       debugPrint('Error creating item: $e');
       rethrow;
     }
@@ -173,7 +178,7 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        _handleSuccessDialog("Upload image successfully");
+        // _handleSuccessDialog("Upload image successfully");
         return true;
       } else {
         debugPrint(
