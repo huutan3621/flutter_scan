@@ -48,6 +48,10 @@ class CreateItemProvider extends ChangeNotifier {
 
   Future<void> init(String? itemNumber, ProductModel? product,
       List<String>? unitListData) async {
+    //get unit
+    disableUnitList = unitListData ?? [];
+    selectedLengthUnit = lengthUnit.last;
+    selectedWeightUnit = weightUnit.last;
     //create completely new
     if (itemNumber == null && product == null) {
       isItemCodeScanEnabled = true;
@@ -67,25 +71,34 @@ class CreateItemProvider extends ChangeNotifier {
     if (itemNumber != null) {
       await getUnitById(itemNumber);
     }
-    //get unit
-    disableUnitList = unitListData ?? [];
-    selectedLengthUnit = lengthUnit.last;
-    selectedWeightUnit = weightUnit.last;
+
     setLoading(false);
     notifyListeners();
   }
 
   Future<void> getUnitById(String itemNumber) async {
     setLoading(true);
-    unitList = await apiService.getUnitById(itemNumber);
-    if (unitList.isNotEmpty) {
-      selectedProductUnit = unitList.first;
+
+    try {
+      unitList = await apiService.getUnitById(itemNumber);
+
+      if (unitList.isNotEmpty) {
+        final disableUnitSet = disableUnitList.toSet();
+        final availableUnits =
+            unitList.where((unit) => !disableUnitSet.contains(unit)).toList();
+        selectedProductUnit = availableUnits.first;
+        print('Available units: $availableUnits');
+      }
+
+      if (isItemCodeScanEnabled) {
+        await getDisableUnit(itemNumber);
+      }
+    } catch (e) {
+      print('Error fetching units: $e');
+    } finally {
+      setLoading(false);
+      notifyListeners();
     }
-    if (isItemCodeScanEnabled == true) {
-      getDisableUnit(itemNumber);
-    }
-    setLoading(false);
-    notifyListeners();
   }
 
   Future<List<ProductModel>> getProductsById(String itemNumber) async {
