@@ -273,17 +273,14 @@ class _HomeChildState extends State<HomeChild> {
                                             margin: const EdgeInsets.symmetric(
                                                 horizontal: 16, vertical: 8),
                                             child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              child: images.isNotEmpty
-                                                  ? Image.network(
-                                                      images[0].url ?? "",
-                                                      fit: BoxFit.cover,
-                                                    )
-                                                  : Container(
-                                                      color: Colors.grey[200],
-                                                    ),
-                                            ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                child: images.isNotEmpty
+                                                    ? Image.network(
+                                                        images[0].url ?? "",
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : const SizedBox.shrink()),
                                           ),
                                         ),
                                       )),

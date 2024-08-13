@@ -292,16 +292,20 @@ class CreateItemProvider extends ChangeNotifier {
   void onSubmit(BuildContext context) async {
     setLoading(true);
 
-    if (formKey.currentState!.validate() && selectedProductUnit != "") {
+    if (formKey.currentState?.validate() == true &&
+        selectedProductUnit.isNotEmpty) {
       try {
-        final bool = await createItem();
-        if (bool == true) {
-          Navigator.pop(context, 'refresh');
+        final bool result = await createItem();
+        if (result) {
+          _showSuccessDialog(context, 'Create successfully');
         }
-      } catch (e) {}
+      } catch (e) {
+        _showDialog(context, 'Error. An exception occurred: $e');
+      }
     } else {
       _showDialog(context, 'Error. Please check the form again');
     }
+
     setLoading(false);
   }
 
@@ -354,6 +358,13 @@ class CreateItemProvider extends ChangeNotifier {
 
   void _showDialog(BuildContext context, String message) {
     DialogHelper.showErrorDialog(
+      context: context,
+      message: message,
+    );
+  }
+
+  void _showSuccessDialog(BuildContext context, String message) {
+    DialogHelper.showSuccessDialog(
       context: context,
       message: message,
     );
