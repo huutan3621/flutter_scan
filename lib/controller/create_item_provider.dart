@@ -96,11 +96,33 @@ class CreateItemProvider extends ChangeNotifier {
 
   Future<void> getDisableUnit(String itemNumber) async {
     setLoading(true);
-    final listData = await getProductsById(itemNumber);
-    disableUnitList = getSelectedUnits(listData);
-    selectedProductUnit = getMissingUnits(listData).first;
-    setLoading(false);
-    notifyListeners();
+
+    try {
+      final listData = await getProductsById(itemNumber);
+
+      if (listData.isEmpty) {
+        disableUnitList = [];
+        selectedProductUnit = '';
+        return;
+      }
+
+      disableUnitList = getSelectedUnits(listData);
+      print(disableUnitList);
+
+      final missingUnits = getMissingUnits(listData);
+      selectedProductUnit = missingUnits.isNotEmpty ? missingUnits.first : '';
+      if (disableUnitList.contains(selectedProductUnit)) {
+        selectedProductUnit = "";
+      }
+      print("selected unit: $selectedProductUnit");
+    } catch (e) {
+      debugPrint('Error getting disable unit: $e');
+      disableUnitList = [];
+      selectedProductUnit = '';
+    } finally {
+      setLoading(false);
+      notifyListeners();
+    }
   }
 
   List<String> getMissingUnits(List<ProductModel> listData) {
