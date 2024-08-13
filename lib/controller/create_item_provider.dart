@@ -51,7 +51,6 @@ class CreateItemProvider extends ChangeNotifier {
     //create completely new
     if (itemNumber == null && product == null) {
       isItemCodeScanEnabled = true;
-      notifyListeners();
     }
     //check product cases
     if (product != null) {
@@ -60,20 +59,19 @@ class CreateItemProvider extends ChangeNotifier {
         barCodeController.text = product.barCode;
         isBarcodeEnable = false;
       }
-      selectedProductUnit = product.unitOfMeasure;
+      // selectedProductUnit = product.unitOfMeasure;
       selectedLengthUnit = lengthUnit.last;
       selectedWeightUnit = weightUnit.last;
-      notifyListeners();
     }
     //have item number but create new
     if (itemNumber != null) {
       await getUnitById(itemNumber);
-      await getDisableUnit(itemNumber);
     }
     //get unit
     disableUnitList = unitListData ?? [];
     selectedLengthUnit = lengthUnit.last;
     selectedWeightUnit = weightUnit.last;
+    setLoading(false);
     notifyListeners();
   }
 
@@ -83,8 +81,8 @@ class CreateItemProvider extends ChangeNotifier {
     if (unitList.isNotEmpty) {
       selectedProductUnit = unitList.first;
     }
-    if (isItemCodeScanEnabled) {
-      await getDisableUnit(itemNumber);
+    if (isItemCodeScanEnabled == true) {
+      getDisableUnit(itemNumber);
     }
     setLoading(false);
     notifyListeners();
@@ -97,32 +95,26 @@ class CreateItemProvider extends ChangeNotifier {
   Future<void> getDisableUnit(String itemNumber) async {
     setLoading(true);
 
-    try {
-      final listData = await getProductsById(itemNumber);
+    final listData = await getProductsById(itemNumber);
 
-      if (listData.isEmpty) {
-        disableUnitList = [];
-        selectedProductUnit = '';
-        return;
-      }
+    if (listData.isEmpty) {
+      disableUnitList = [];
+      selectedProductUnit = '';
+      return;
+    }
 
-      disableUnitList = getSelectedUnits(listData);
-      print(disableUnitList);
+    disableUnitList = getSelectedUnits(listData);
 
+    if (disableUnitList.isNotEmpty) {
       final missingUnits = getMissingUnits(listData);
       selectedProductUnit = missingUnits.isNotEmpty ? missingUnits.first : '';
       if (disableUnitList.contains(selectedProductUnit)) {
         selectedProductUnit = "";
       }
-      print("selected unit: $selectedProductUnit");
-    } catch (e) {
-      debugPrint('Error getting disable unit: $e');
-      disableUnitList = [];
-      selectedProductUnit = '';
-    } finally {
-      setLoading(false);
-      notifyListeners();
     }
+
+    setLoading(false);
+    notifyListeners();
   }
 
   List<String> getMissingUnits(List<ProductModel> listData) {
