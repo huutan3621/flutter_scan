@@ -86,7 +86,7 @@ class CreateItemProvider extends ChangeNotifier {
       if (unitList.isNotEmpty && isItemCodeScanEnabled == false) {
         final disableUnitSet = disableUnitList.toSet();
         final availableUnits =
-            unitList.where((unit) => disableUnitSet.contains(unit)).toList();
+            unitList.toSet().difference(disableUnitSet).toList();
         selectedProductUnit = availableUnits.first;
         print('Available units: $availableUnits');
       } else if (unitList.isNotEmpty && isItemCodeScanEnabled == true) {
