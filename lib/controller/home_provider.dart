@@ -24,9 +24,9 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> onRefresh() async {
-    await getProductsById(textController.text);
-    await getUnitById(textController.text);
+  Future<void> onRefresh(BuildContext context) async {
+    await getProductsById(textController.text, context);
+    await getUnitById(textController.text, context);
     setLoading(false);
     notifyListeners();
   }
@@ -35,29 +35,41 @@ class HomeProvider extends ChangeNotifier {
     scanResult = Utils.handleTSScanResult(result, context);
     textController.text = scanResult;
     notifyListeners();
-    if (scanResult != "") {
-      await getProductsById(scanResult);
-      await getUnitById(scanResult);
-      await checkNavigateAfterScan(context);
+    if (scanResult.isNotEmpty) {
+      await getProductsById(scanResult, context);
+      await getUnitById(scanResult, context);
     } else {
       dataList.clear();
       unitList.clear();
       notifyListeners();
     }
+    await checkNavigateAfterScan(context);
   }
 
-  Future<void> getProductsById(String itemNumber) async {
-    setLoading(true);
+  Future<void> getProductsById(String itemNumber, BuildContext context) async {
+    // setLoading(true);
+    // try {
     dataList = await apiService.getProductsById(itemNumber);
-    setLoading(false);
-    notifyListeners();
+    //   notifyListeners();
+    // } catch (e) {
+    //   // DialogHelper.showErrorDialog(
+    //   //     context: context, message: "Có lỗi xã ra, vui lòng thử lại");
+    // } finally {
+    // setLoading(false);
+    // }
   }
 
-  Future<void> getUnitById(String itemNumber) async {
-    setLoading(true);
+  Future<void> getUnitById(String itemNumber, BuildContext context) async {
+    // setLoading(true);
+    // try {
     unitList = await apiService.getUnitById(itemNumber);
-    setLoading(false);
     notifyListeners();
+    // } catch (e) {
+    //   // DialogHelper.showErrorDialog(
+    //   //     context: context, message: "Có lỗi xã ra, vui lòng thử lại");
+    // } finally {
+    // setLoading(false);
+    // }
   }
 
   @override
@@ -82,6 +94,15 @@ class HomeProvider extends ChangeNotifier {
     final unitsInList = dataList.map((item) => item.unitOfMeasure).toSet();
     final allUnits = unitList.toSet();
     return unitsInList.intersection(allUnits).toList();
+  }
+
+  Future<void> cleanAndNavigateToCreateScreen(BuildContext context) async {
+    scanResult = "";
+    textController.clear();
+    dataList.clear();
+    unitList.clear();
+    notifyListeners();
+    await navigateToCreateScreen(context);
   }
 
   Future<void> navigateToCreateScreen(BuildContext context) async {
@@ -122,11 +143,11 @@ class HomeProvider extends ChangeNotifier {
           ),
         );
         if (result == 'refresh' && scanResult.isNotEmpty) {
-          await getProductsById(scanResult);
+          await getProductsById(scanResult, context);
         }
       } else {
         DialogHelper.showErrorDialog(
-            context: context, message: "No available item.");
+            context: context, message: "Không có giá trị đơn vị kả dụng");
       }
     } else if (!containsAllUnits()) {
       // Trường hợp 2: dataList còn thiếu đơn vị đo lường nào
@@ -143,12 +164,12 @@ class HomeProvider extends ChangeNotifier {
         ),
       );
       if (result == 'refresh' && scanResult.isNotEmpty) {
-        await getProductsById(scanResult);
+        await getProductsById(scanResult, context);
       }
     } else {
       // Trường hợp 3: dataList chứa tất cả đơn vị đo lường
       DialogHelper.showErrorDialog(
-          context: context, message: "All item units are included");
+          context: context, message: "Tất cả đơn vị đã có giá trị");
     }
   }
 
@@ -177,11 +198,11 @@ class HomeProvider extends ChangeNotifier {
           ),
         );
         if (result == 'refresh' && scanResult.isNotEmpty) {
-          await getProductsById(scanResult);
+          await getProductsById(scanResult, context);
         }
       } else {
         DialogHelper.showErrorDialog(
-            context: context, message: "No available item.");
+            context: context, message: "Không có giá trị đơn vị khả dụng");
       }
     } else if (!containsAllUnits()) {
       // Trường hợp 2: dataList còn thiếu đơn vị đo lường nào
@@ -198,7 +219,7 @@ class HomeProvider extends ChangeNotifier {
         ),
       );
       if (result == 'refresh' && scanResult.isNotEmpty) {
-        await getProductsById(scanResult);
+        await getProductsById(scanResult, context);
       }
     }
   }
@@ -215,23 +236,23 @@ class HomeProvider extends ChangeNotifier {
   showAlertDialog(BuildContext context, String itemCode, String barCode,
       String unitOfMeasure) {
     Widget cancelButton = CustomButton(
-      title: "Cancel",
+      title: "Bỏ qua",
       btnColor: Colors.blue[400],
       onTap: () {
         Navigator.of(context).pop();
       },
     );
     Widget continueButton = CustomButton(
-      title: "Confirm",
+      title: "Xác nhận",
       btnColor: Colors.red[400],
       onTap: () {
-        blockData(itemCode, barCode, unitOfMeasure);
+        blockData(itemCode, barCode, unitOfMeasure, context);
         Navigator.of(context).pop();
       },
     );
     AlertDialog alert = AlertDialog(
-      title: const Text("Delete"),
-      content: const Text("Would you like to Delete the item"),
+      title: const Text("Xoá"),
+      content: const Text("Bạn có chắc chắn xoá không?"),
       actions: [
         continueButton,
         const SizedBox(
@@ -249,11 +270,11 @@ class HomeProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> blockData(
-      String itemCode, String barCode, String unitOfMeasure) async {
+  Future<void> blockData(String itemCode, String barCode, String unitOfMeasure,
+      BuildContext context) async {
     final result = await apiService.blockData(itemCode, barCode, unitOfMeasure);
     if (result) {
-      await onRefresh();
+      await onRefresh(context);
     }
   }
 }

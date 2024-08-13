@@ -45,7 +45,7 @@ class _HomeChildState extends State<HomeChild> {
 
   void _refreshData() async {
     var homeProvider = Provider.of<HomeProvider>(context, listen: false);
-    await homeProvider.onRefresh();
+    await homeProvider.onRefresh(context);
   }
 
   @override
@@ -80,7 +80,9 @@ class _HomeChildState extends State<HomeChild> {
                     btnColor: Colors.green[300],
                   ),
                   CustomButton(
-                    onTap: () async {},
+                    onTap: () async {
+                      value.cleanAndNavigateToCreateScreen(context);
+                    },
                     title: 'Cập nhật và tạo mới',
                   ),
                 ],

@@ -13,11 +13,11 @@ class DialogHelper {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Error'),
+          title: const Text('Lỗi'),
           content: Text(
-            'Failed with status code: $statusCode\n'
-            'Message: $message\n'
-            'Response: $response',
+            'Mã lối: $statusCode\n'
+            'Chi tiết: $message\n'
+            'Phản hồi: $response',
           ),
           actions: <Widget>[
             TextButton(
@@ -40,7 +40,7 @@ class DialogHelper {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Success'),
+          title: const Text('Thành công'),
           content: Text(message),
           actions: <Widget>[
             TextButton(
@@ -63,7 +63,7 @@ class DialogHelper {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Error'),
+          title: const Text('Lỗi'),
           content: Text(message),
           actions: <Widget>[
             TextButton(

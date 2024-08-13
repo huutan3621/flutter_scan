@@ -22,7 +22,7 @@ class Utils {
     } else if (isValidTextFormat(result)) {
       return result = extractNumberFromText(result);
     } else {
-      showErrorDialog("Invalid scan code");
+      showErrorDialog("Barcode không khả dụng");
       return "";
     }
   }

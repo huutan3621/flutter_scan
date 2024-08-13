@@ -78,20 +78,24 @@ class CreateItemProvider extends ChangeNotifier {
 
   Future<void> getUnitById(String itemNumber) async {
     setLoading(true);
+    try {
+      unitList = await apiService.getUnitById(itemNumber);
 
-    unitList = await apiService.getUnitById(itemNumber);
-
-    if (unitList.isNotEmpty && isItemCodeScanEnabled == false) {
-      final disableUnitSet = disableUnitList.toSet();
-      final availableUnits =
-          unitList.where((unit) => disableUnitSet.contains(unit)).toList();
-      selectedProductUnit = availableUnits.first;
-      print('Available units: $availableUnits');
-    } else if (unitList.isNotEmpty && isItemCodeScanEnabled == true) {
-      await getDisableUnit(itemNumber);
+      if (unitList.isNotEmpty && isItemCodeScanEnabled == false) {
+        final disableUnitSet = disableUnitList.toSet();
+        final availableUnits =
+            unitList.where((unit) => disableUnitSet.contains(unit)).toList();
+        selectedProductUnit = availableUnits.first;
+        print('Available units: $availableUnits');
+      } else if (unitList.isNotEmpty && isItemCodeScanEnabled == true) {
+        await getDisableUnit(itemNumber);
+      }
+    } catch (e) {
+      // DialogHelper.showErrorDialog(
+      //     context: context, message: "Có lỗi xã ra, vui lòng thử lại");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
     notifyListeners();
   }
 
@@ -101,26 +105,30 @@ class CreateItemProvider extends ChangeNotifier {
 
   Future<void> getDisableUnit(String itemNumber) async {
     setLoading(true);
+    try {
+      final listData = await getProductsById(itemNumber);
 
-    final listData = await getProductsById(itemNumber);
-
-    if (listData.isEmpty) {
-      disableUnitList = [];
-      selectedProductUnit = '';
-      return;
-    }
-
-    disableUnitList = getSelectedUnits(listData);
-
-    if (disableUnitList.isNotEmpty) {
-      final missingUnits = getMissingUnits(listData);
-      selectedProductUnit = missingUnits.isNotEmpty ? missingUnits.first : '';
-      if (disableUnitList.contains(selectedProductUnit)) {
-        selectedProductUnit = "";
+      if (listData.isEmpty) {
+        disableUnitList = [];
+        selectedProductUnit = '';
+        return;
       }
-    }
 
-    setLoading(false);
+      disableUnitList = getSelectedUnits(listData);
+
+      if (disableUnitList.isNotEmpty) {
+        final missingUnits = getMissingUnits(listData);
+        selectedProductUnit = missingUnits.isNotEmpty ? missingUnits.first : '';
+        if (disableUnitList.contains(selectedProductUnit)) {
+          selectedProductUnit = "";
+        }
+      }
+    } catch (e) {
+      // DialogHelper.showErrorDialog(
+      //     context: context, message: "Có lỗi xã ra, vui lòng thử lại");
+    } finally {
+      setLoading(false);
+    }
     notifyListeners();
   }
 
@@ -172,7 +180,7 @@ class CreateItemProvider extends ChangeNotifier {
     if (res is String) {
       final scanValue = handleScanResult(res, context);
       itemCodeController.text = scanValue;
-      if (scanValue != "") {
+      if (scanValue.isNotEmpty) {
         await getUnitById(scanValue);
       }
       notifyListeners();
@@ -180,10 +188,10 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   Future<void> scanBarCode(BuildContext context) async {
-    if (isBarcodeEnable == false) {
-      _showDialog(
+    if (!isBarcodeEnable) {
+      showErrorDialog(
         context,
-        'Barcode is already set. Scanning is not allowed.',
+        'Barcode đã tồn tại',
       );
       return;
     }
@@ -194,14 +202,17 @@ class CreateItemProvider extends ChangeNotifier {
         builder: (context) => const SimpleBarcodeScannerPage(),
       ),
     );
-    if (res is String) {
-      final isValidCode = Utils.isValidBarcode(res);
-      if (isValidCode) {
-        barCodeController.text = res;
-      } else {
-        _showDialog(context, "Invalid scan code");
-      }
+
+    if (res is String && res != '-1') {
+      barCodeController.text = res;
       notifyListeners();
+    } else {
+      if (res == '-1') {
+        barCodeController.text = "";
+        notifyListeners();
+
+        showErrorDialog(context, 'Có lỗi xảy ra khi quét Barcode');
+      }
     }
   }
 
@@ -212,7 +223,7 @@ class CreateItemProvider extends ChangeNotifier {
 
   void chooseImageFromGallery(BuildContext context) async {
     if (images.length >= 5) {
-      _showDialog(
+      showErrorDialog(
         context,
         'Chỉ cho phép tối đa 5 ảnh',
       );
@@ -233,7 +244,7 @@ class CreateItemProvider extends ChangeNotifier {
       if (fileSize <= 2 * 1024 * 1024) {
         validImages.add(pickedFile);
       } else {
-        _showDialog(
+        showErrorDialog(
           context,
           'Dung lượng ảnh phải dưới 2MB',
         );
@@ -245,7 +256,7 @@ class CreateItemProvider extends ChangeNotifier {
         images.addAll(validImages);
         notifyListeners();
       } else {
-        _showDialog(
+        showErrorDialog(
           context,
           'Không thể thêm hơn 5 ảnh',
         );
@@ -257,7 +268,7 @@ class CreateItemProvider extends ChangeNotifier {
 
   void chooseImageFromCamera(BuildContext context) async {
     if (images.length >= 5) {
-      _showDialog(
+      showErrorDialog(
         context,
         'Maximum 5 images allowed',
       );
@@ -278,7 +289,7 @@ class CreateItemProvider extends ChangeNotifier {
         images.add(pickedFile);
         notifyListeners();
       } else {
-        _showDialog(
+        showErrorDialog(
           context,
           'Dung lượng ảnh phải dưới 2MB',
         );
@@ -303,10 +314,10 @@ class CreateItemProvider extends ChangeNotifier {
           Navigator.pop(context, 'refresh');
         }
       } else {
-        _showDialog(context, 'Lỗi, xin hãy kiểm tra lại các trường');
+        showErrorDialog(context, 'Lỗi, xin hãy kiểm tra lại các trường');
       }
     } catch (e) {
-      _showDialog(context, 'Lỗi xảy ra: $e');
+      showErrorDialog(context, 'Lỗi xảy ra: $e');
     } finally {
       setLoading(false); // This will always be called
     }
@@ -361,14 +372,14 @@ class CreateItemProvider extends ChangeNotifier {
     return await apiService.updateProductImage(productId, images);
   }
 
-  void _showDialog(BuildContext context, String message) {
+  void showErrorDialog(BuildContext context, String message) {
     DialogHelper.showErrorDialog(
       context: context,
       message: message,
     );
   }
 
-  void _showSuccessDialog(BuildContext context, String message) {
+  void showSuccessDialog(BuildContext context, String message) {
     DialogHelper.showSuccessDialog(
       context: context,
       message: message,

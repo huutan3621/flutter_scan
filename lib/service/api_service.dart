@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_scanner_app/main.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
@@ -7,10 +9,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_scanner_app/model/product_model.dart'; // Adjust the import according to your project structure
 
 class ApiService {
-  final String baseUrl = 'https://scanproduct.trungsoncare.com';
+  final String baseUrl;
   final Dio dio;
 
   ApiService({
+    this.baseUrl = 'https://scanproduct.trungsoncare.com/',
     Dio? dio,
   }) : dio = dio ?? Dio();
 
@@ -45,9 +48,12 @@ class ApiService {
 
   Future<List<ProductModel>> getProductsById(String itemNumber) async {
     try {
+      log('$baseUrl/api/ScanProduct/get-scan-product-data-by-item-number/$itemNumber');
       final response = await dio.get(
-        '$baseUrl/api/ScanProduct/get-scan-product-data-by-item-number/$itemNumber',
-      );
+          '$baseUrl/api/ScanProduct/get-scan-product-data-by-item-number/$itemNumber',
+          options: Options(
+            headers: {'Content-Type': 'application/json'},
+          ));
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = response.data;
@@ -55,7 +61,6 @@ class ApiService {
             .map((jsonItem) => ProductModel.fromJson(jsonItem))
             .toList();
       } else {
-        _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
         throw Exception(
             'Failed to load products. Status code: ${response.statusCode}');
       }
