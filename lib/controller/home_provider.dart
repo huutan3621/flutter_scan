@@ -19,8 +19,15 @@ class HomeProvider extends ChangeNotifier {
 
   Future<void> init(BuildContext context) async {}
 
-  Future<void> setLoading(bool value) async {
+  void setLoading(bool value) {
     isLoading = value;
+    notifyListeners();
+  }
+
+  Future<void> onRefresh() async {
+    await getProductsById(textController.text);
+    await getUnitById(textController.text);
+    setLoading(false);
     notifyListeners();
   }
 
@@ -40,16 +47,16 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<void> getProductsById(String itemNumber) async {
-    await setLoading(true);
+    setLoading(true);
     dataList = await apiService.getProductsById(itemNumber);
-    await setLoading(false);
+    setLoading(false);
     notifyListeners();
   }
 
   Future<void> getUnitById(String itemNumber) async {
-    await setLoading(true);
+    setLoading(true);
     unitList = await apiService.getUnitById(itemNumber);
-    await setLoading(false);
+    setLoading(false);
     notifyListeners();
   }
 

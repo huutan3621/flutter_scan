@@ -43,6 +43,11 @@ class _HomeChildState extends State<HomeChild> {
     super.dispose();
   }
 
+  void _refreshData() async {
+    var homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    await homeProvider.onRefresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeProvider>(
@@ -52,6 +57,15 @@ class _HomeChildState extends State<HomeChild> {
           child: Scaffold(
             appBar: AppBar(
               title: const Text('Item List'),
+              actions: [
+                Visibility(
+                  visible: value.textController.text != "",
+                  child: IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: _refreshData,
+                  ),
+                ),
+              ],
             ),
             body: SingleChildScrollView(
               scrollDirection: Axis.vertical,
@@ -98,193 +112,185 @@ class _HomeChildState extends State<HomeChild> {
                   ),
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 16),
-                    child: RefreshIndicator(
-                      onRefresh: () async {
-                        await value.getProductsById(value.scanResult);
-                      },
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          columnSpacing: 12,
-                          dataRowHeight: 100,
-                          border: TableBorder.all(
-                            color: Colors.black,
-                            width: 1,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columnSpacing: 12,
+                        dataRowHeight: 100,
+                        border: TableBorder.all(
+                          color: Colors.black,
+                          width: 1,
+                        ),
+                        columns: [
+                          DataColumn(
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Text('Item Code',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                            ),
                           ),
-                          columns: [
-                            DataColumn(
-                              label: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: const Text('Item Code',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ),
+                          DataColumn(
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Text('Bar Code',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                            DataColumn(
-                              label: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: const Text('Bar Code',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ),
+                          ),
+                          DataColumn(
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Text('Unit',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                            DataColumn(
-                              label: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: const Text('Unit',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ),
+                          ),
+                          DataColumn(
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Text('Length (mm)',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                            DataColumn(
-                              label: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: const Text('Length (mm)',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ),
+                          ),
+                          DataColumn(
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Text('Width (mm)',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                            DataColumn(
-                              label: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: const Text('Width (mm)',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ),
+                          ),
+                          DataColumn(
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Text('Height (mm)',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                            DataColumn(
-                              label: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: const Text('Height (mm)',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ),
+                          ),
+                          DataColumn(
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Text('Weight (mg)',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                            DataColumn(
-                              label: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: const Text('Weight (mg)',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ),
+                          ),
+                          DataColumn(
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Text('Image',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                            DataColumn(
-                              label: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: const Text('Image',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                          ],
-                          rows: value.dataList.isEmpty
-                              ? [
-                                  DataRow(
-                                    cells: [
-                                      DataCell(
-                                        Container(
-                                          padding: const EdgeInsets.all(16),
-                                          child: const Center(
-                                            child: Text("No data available",
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.red)),
-                                          ),
+                          ),
+                        ],
+                        rows: value.dataList.isEmpty
+                            ? [
+                                DataRow(
+                                  cells: [
+                                    DataCell(
+                                      Container(
+                                        padding: const EdgeInsets.all(16),
+                                        child: const Center(
+                                          child: Text("No data available",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.red)),
                                         ),
                                       ),
-                                      ...List.generate(
-                                        7,
-                                        (index) => DataCell(Container()),
-                                      ),
-                                    ],
-                                  ),
-                                ]
-                              : List.generate(
-                                  value.dataList.length,
-                                  (rowIndex) {
-                                    final List<ImageViewModel> images =
-                                        value.dataList[rowIndex].images ?? [];
-                                    final hasMoreImages = images.length > 1;
+                                    ),
+                                    ...List.generate(
+                                      7,
+                                      (index) => DataCell(Container()),
+                                    ),
+                                  ],
+                                ),
+                              ]
+                            : List.generate(
+                                value.dataList.length,
+                                (rowIndex) {
+                                  final List<ImageViewModel> images =
+                                      value.dataList[rowIndex].images ?? [];
+                                  final hasMoreImages = images.length > 1;
 
-                                    return DataRow(
-                                      cells: [
-                                        DataCell(Container(
-                                          child: Center(
-                                              child: Text(value
-                                                  .dataList[rowIndex].itemCode
-                                                  .toString())),
-                                        )),
-                                        DataCell(Container(
-                                          child: Center(
-                                              child: Text(value
-                                                  .dataList[rowIndex].barCode)),
-                                        )),
-                                        DataCell(Container(
-                                          child: Center(
-                                              child: Text(value
-                                                  .dataList[rowIndex]
-                                                  .unitOfMeasure
-                                                  .toString())),
-                                        )),
-                                        DataCell(Container(
-                                          child: Center(
-                                              child: Text(value
-                                                  .dataList[rowIndex].length
-                                                  .toString())),
-                                        )),
-                                        DataCell(Container(
-                                          child: Center(
-                                              child: Text(value
-                                                  .dataList[rowIndex].width
-                                                  .toString())),
-                                        )),
-                                        DataCell(Container(
-                                          child: Center(
-                                              child: Text(value
-                                                  .dataList[rowIndex].height
-                                                  .toString())),
-                                        )),
-                                        DataCell(Container(
-                                          child: Center(
-                                              child: Text(value
-                                                  .dataList[rowIndex].weight
-                                                  .toString())),
-                                        )),
-                                        DataCell(Container(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              if (images.isNotEmpty) {
-                                                value.showImagePreview(
-                                                    context, images);
-                                              }
-                                            },
-                                            child: Container(
-                                              width: 100,
-                                              height: 80,
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 8),
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                child: images.isNotEmpty
-                                                    ? Image.network(
-                                                        images[0].url ?? "",
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Container(
-                                                        color: Colors.grey[200],
-                                                      ),
-                                              ),
+                                  return DataRow(
+                                    cells: [
+                                      DataCell(Container(
+                                        child: Center(
+                                            child: Text(value
+                                                .dataList[rowIndex].itemCode
+                                                .toString())),
+                                      )),
+                                      DataCell(Container(
+                                        child: Center(
+                                            child: Text(value
+                                                .dataList[rowIndex].barCode)),
+                                      )),
+                                      DataCell(Container(
+                                        child: Center(
+                                            child: Text(value.dataList[rowIndex]
+                                                .unitOfMeasure
+                                                .toString())),
+                                      )),
+                                      DataCell(Container(
+                                        child: Center(
+                                            child: Text(value
+                                                .dataList[rowIndex].length
+                                                .toString())),
+                                      )),
+                                      DataCell(Container(
+                                        child: Center(
+                                            child: Text(value
+                                                .dataList[rowIndex].width
+                                                .toString())),
+                                      )),
+                                      DataCell(Container(
+                                        child: Center(
+                                            child: Text(value
+                                                .dataList[rowIndex].height
+                                                .toString())),
+                                      )),
+                                      DataCell(Container(
+                                        child: Center(
+                                            child: Text(value
+                                                .dataList[rowIndex].weight
+                                                .toString())),
+                                      )),
+                                      DataCell(Container(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            if (images.isNotEmpty) {
+                                              value.showImagePreview(
+                                                  context, images);
+                                            }
+                                          },
+                                          child: Container(
+                                            width: 100,
+                                            height: 80,
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 8),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: images.isNotEmpty
+                                                  ? Image.network(
+                                                      images[0].url ?? "",
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : Container(
+                                                      color: Colors.grey[200],
+                                                    ),
                                             ),
                                           ),
-                                        )),
-                                      ],
-                                    );
-                                  },
-                                ),
-                        ),
+                                        ),
+                                      )),
+                                    ],
+                                  );
+                                },
+                              ),
                       ),
                     ),
                   ),
