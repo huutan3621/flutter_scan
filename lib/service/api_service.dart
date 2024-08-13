@@ -91,28 +91,22 @@ class ApiService {
 
   Future<ProductModel> createItem(ProductModel body) async {
     try {
-      final requestPayload = body.toJson();
-      print('Sending request with payload: $requestPayload');
-
       final response = await dio.post(
         '$baseUrl/api/ScanProduct/create-scan-product-data',
-        data: requestPayload,
+        data: body.toJson(),
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
 
       if (response.statusCode == 200) {
         return ProductModel.fromJson(response.data);
       } else {
-        final errorMessage = response.data['message'] ?? 'Unknown error';
         throw Exception(
-            'Failed to create item. Status code: ${response.statusCode}, Message: $errorMessage');
+            'Failed to create item. Status code: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      print('DioException: ${e.message}');
-      _handleErrorDialog(e.response?.data);
+      _handleDioError(e);
       rethrow;
     } catch (e) {
-      print('Exception: $e');
       debugPrint('Error creating item: $e');
       rethrow;
     }

@@ -287,6 +287,8 @@ class CreateItemProvider extends ChangeNotifier {
     if (weightController.text.isNotEmpty) {
       weight = int.parse(UnitUtils.convertWeight(
           weightController.text, selectedLengthUnit, WeightUnitEnum.g.name));
+    } else {
+      weight == null;
     }
 
     ProductModel body = ProductModel(
