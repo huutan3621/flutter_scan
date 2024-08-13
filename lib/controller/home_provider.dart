@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/screens/create_item_screen.dart';
 import 'package:flutter_scanner_app/service/api_service.dart';
+import 'package:flutter_scanner_app/utils/network_helper.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
 import 'package:flutter_scanner_app/widgets/custom_button.dart';
-
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 import 'package:flutter_scanner_app/widgets/image_review_dialog.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class HomeProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
+  final NetworkHelper networkHelper = NetworkHelper();
   late String scanResult = '';
   final TextEditingController textController = TextEditingController();
   late List<ProductModel> dataList = [];
   late List<String> unitList = [];
   bool isLoading = false;
+  bool _networkDialogShown = false;
 
   Future<void> init(BuildContext context) async {}
 
@@ -25,10 +27,29 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<void> onRefresh(BuildContext context) async {
-    await getProductsById(textController.text, context);
-    await getUnitById(textController.text, context);
-    setLoading(false);
-    notifyListeners();
+    await _fetchData(scanResult, context);
+  }
+
+  Future<void> navigateToScanScreen(BuildContext context) async {
+    bool isConnected = await networkHelper.isConnected();
+    debugPrint('Network connected: $isConnected');
+
+    if (isConnected) {
+      var res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SimpleBarcodeScannerPage(),
+        ),
+      );
+      if (res is String) {
+        handleScanResult(res, context);
+      }
+    } else {
+      debugPrint('No network connection. Showing error dialog.');
+      DialogHelper.showErrorDialog(
+        message: "Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
+      );
+    }
   }
 
   Future<void> handleScanResult(String result, BuildContext context) async {
@@ -36,8 +57,7 @@ class HomeProvider extends ChangeNotifier {
     textController.text = scanResult;
     notifyListeners();
     if (scanResult.isNotEmpty) {
-      await getProductsById(scanResult, context);
-      await getUnitById(scanResult, context);
+      await _fetchData(scanResult, context);
     } else {
       dataList.clear();
       unitList.clear();
@@ -46,30 +66,27 @@ class HomeProvider extends ChangeNotifier {
     await checkNavigateAfterScan(context);
   }
 
-  Future<void> getProductsById(String itemNumber, BuildContext context) async {
-    // setLoading(true);
-    // try {
-    dataList = await apiService.getProductsById(itemNumber);
-    //   notifyListeners();
-    // } catch (e) {
-    //   // DialogHelper.showErrorDialog(
-    //   //     context: context, message: "Có lỗi xã ra, vui lòng thử lại");
-    // } finally {
-    // setLoading(false);
-    // }
-  }
-
-  Future<void> getUnitById(String itemNumber, BuildContext context) async {
-    // setLoading(true);
-    // try {
-    unitList = await apiService.getUnitById(itemNumber);
-    notifyListeners();
-    // } catch (e) {
-    //   // DialogHelper.showErrorDialog(
-    //   //     context: context, message: "Có lỗi xã ra, vui lòng thử lại");
-    // } finally {
-    // setLoading(false);
-    // }
+  Future<void> _fetchData(String itemNumber, BuildContext context) async {
+    if (await networkHelper.isConnected()) {
+      _networkDialogShown = false;
+      setLoading(true);
+      try {
+        await Future.wait([
+          apiService
+              .getProductsById(itemNumber)
+              .then((data) => dataList = data),
+          apiService.getUnitById(itemNumber).then((units) => unitList = units),
+        ]);
+        notifyListeners();
+      } catch (e) {
+        // Handle exception if needed
+      } finally {
+        setLoading(false);
+      }
+    } else if (!_networkDialogShown) {
+      _networkDialogShown = true;
+      DialogHelper.showErrorDialog(message: "Không có kết nối mạng");
+    }
   }
 
   @override
@@ -97,30 +114,49 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<void> cleanAndNavigateToCreateScreen(BuildContext context) async {
-    scanResult = "";
-    textController.clear();
-    dataList.clear();
-    unitList.clear();
-    notifyListeners();
-    await navigateToCreateScreen(context);
+    bool isConnected = await networkHelper.isConnected();
+    debugPrint('Network connected: $isConnected');
+
+    if (isConnected) {
+      scanResult = "";
+      textController.clear();
+      dataList.clear();
+      unitList.clear();
+      notifyListeners();
+      await navigateToCreateScreen(context);
+    } else {
+      debugPrint('No network connection. Showing error dialog.');
+      DialogHelper.showErrorDialog(
+        message: "Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
+      );
+    }
   }
 
   Future<void> navigateToCreateScreen(BuildContext context) async {
-    if (scanResult.isNotEmpty) {
-      await checkNavigate(context);
+    bool isConnected = await networkHelper.isConnected();
+    debugPrint('Network connected: $isConnected');
+
+    if (isConnected) {
+      if (dataList.isNotEmpty) {
+        await checkNavigate(context);
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CreateItemScreen(),
+          ),
+        );
+      }
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const CreateItemScreen(),
-        ),
+      debugPrint('No network connection. Showing error dialog.');
+      DialogHelper.showErrorDialog(
+        message: "Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
       );
     }
   }
 
   Future<void> checkNavigate(BuildContext context) async {
     if (dataList.isEmpty) {
-      // Trường hợp 1: dataList chưa có item nào
       if (unitList.isNotEmpty) {
         final result = await Navigator.push(
           context,
@@ -143,14 +179,13 @@ class HomeProvider extends ChangeNotifier {
           ),
         );
         if (result == 'refresh' && scanResult.isNotEmpty) {
-          await getProductsById(scanResult, context);
+          await _fetchData(scanResult, context);
         }
-      } else {
+      } else if (scanResult.isNotEmpty) {
         DialogHelper.showErrorDialog(
-            context: context, message: "Không có giá trị đơn vị kả dụng");
+            message: "Không có giá trị đơn vị khả dụng");
       }
     } else if (!containsAllUnits()) {
-      // Trường hợp 2: dataList còn thiếu đơn vị đo lường nào
       final result = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -164,62 +199,68 @@ class HomeProvider extends ChangeNotifier {
         ),
       );
       if (result == 'refresh' && scanResult.isNotEmpty) {
-        await getProductsById(scanResult, context);
+        await _fetchData(scanResult, context);
       }
     } else {
-      // Trường hợp 3: dataList chứa tất cả đơn vị đo lường
-      DialogHelper.showErrorDialog(
-          context: context, message: "Tất cả đơn vị đã có giá trị");
+      DialogHelper.showErrorDialog(message: "Tất cả đơn vị đã có giá trị");
     }
   }
 
   Future<void> checkNavigateAfterScan(BuildContext context) async {
-    if (dataList.isEmpty) {
-      // Trường hợp 1: dataList chưa có item nào
-      if (unitList.isNotEmpty) {
-        final result = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CreateItemScreen(
-              product: ProductModel(
-                itemCode: scanResult,
-                barCode: '',
-                unitOfMeasure: unitList.first,
-                length: 0,
-                width: 0,
-                height: 0,
-                weight: 0,
-                createBy: '',
-                createDate: DateTime.now(),
-                images: [],
+    if (await networkHelper.isConnected()) {
+      // Thay thế
+      setLoading(true);
+      try {
+        if (dataList.isEmpty) {
+          if (unitList.isNotEmpty) {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CreateItemScreen(
+                  product: ProductModel(
+                    itemCode: scanResult,
+                    barCode: '',
+                    unitOfMeasure: unitList.first,
+                    length: 0,
+                    width: 0,
+                    height: 0,
+                    weight: 0,
+                    createBy: '',
+                    createDate: DateTime.now(),
+                    images: [],
+                  ),
+                  itemCode: scanResult,
+                ),
               ),
-              itemCode: scanResult,
+            );
+            if (result == 'refresh' && scanResult.isNotEmpty) {
+              await _fetchData(scanResult, context);
+            }
+          }
+        } else if (!containsAllUnits()) {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CreateItemScreen(
+                product: dataList[0].copyWith(
+                  unitOfMeasure: getMissingUnits().first,
+                ),
+                unitList: getSelectedUnits(),
+                itemCode: scanResult,
+              ),
             ),
-          ),
-        );
-        if (result == 'refresh' && scanResult.isNotEmpty) {
-          await getProductsById(scanResult, context);
+          );
+          if (result == 'refresh' && scanResult.isNotEmpty) {
+            await _fetchData(scanResult, context);
+          }
         }
-      } else {
-        DialogHelper.showErrorDialog(
-            context: context, message: "Không có giá trị đơn vị khả dụng");
+      } finally {
+        setLoading(false);
       }
-    } else if (!containsAllUnits()) {
-      // Trường hợp 2: dataList còn thiếu đơn vị đo lường nào
-      final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CreateItemScreen(
-            product: dataList[0].copyWith(
-              unitOfMeasure: getMissingUnits().first,
-            ),
-            unitList: getSelectedUnits(),
-            itemCode: scanResult,
-          ),
-        ),
-      );
-      if (result == 'refresh' && scanResult.isNotEmpty) {
-        await getProductsById(scanResult, context);
+    } else {
+      if (!_networkDialogShown) {
+        _networkDialogShown = true;
+        DialogHelper.showErrorDialog(message: "Không có kết nối mạng");
       }
     }
   }
@@ -261,7 +302,6 @@ class HomeProvider extends ChangeNotifier {
         cancelButton,
       ],
     );
-    // show the dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -272,9 +312,15 @@ class HomeProvider extends ChangeNotifier {
 
   Future<void> blockData(String itemCode, String barCode, String unitOfMeasure,
       BuildContext context) async {
-    final result = await apiService.blockData(itemCode, barCode, unitOfMeasure);
-    if (result) {
-      await onRefresh(context);
+    if (await networkHelper.isConnected()) {
+      final result =
+          await apiService.blockData(itemCode, barCode, unitOfMeasure);
+      if (result) {
+        await onRefresh(context);
+      }
+    } else if (!_networkDialogShown) {
+      _networkDialogShown = true;
+      DialogHelper.showErrorDialog(message: "Không có kết nối mạng");
     }
   }
 }

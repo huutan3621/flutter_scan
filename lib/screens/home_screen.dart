@@ -108,16 +108,7 @@ class _HomeChildState extends State<HomeChild> {
                               suffixIcon: Icon(Icons.qr_code),
                             ),
                             onTap: () async {
-                              var res = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SimpleBarcodeScannerPage(),
-                                ),
-                              );
-                              if (res is String) {
-                                value.handleScanResult(res, context);
-                              }
+                              value.navigateToScanScreen(context);
                             },
                           ),
                         ),

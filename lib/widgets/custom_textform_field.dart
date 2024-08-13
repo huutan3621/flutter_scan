@@ -75,7 +75,6 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
         });
       } else {
         DialogHelper.showErrorDialog(
-            context: context,
             message: 'Xin hãy nhập số nguyên trước khi đổi đơn vị');
       }
     }

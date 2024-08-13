@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/utils/enum.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/service/api_service.dart';
+import 'package:flutter_scanner_app/utils/network_helper.dart';
 import 'package:flutter_scanner_app/utils/unit_utils.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
@@ -18,6 +19,7 @@ class CreateItemProvider extends ChangeNotifier {
   late List<String> unitList = [];
   late bool isBarcodeEnable = true;
   late bool isItemCodeScanEnabled = false;
+  final NetworkHelper networkHelper = NetworkHelper();
 
   // Controllers
   final TextEditingController itemCodeController = TextEditingController();
@@ -167,27 +169,57 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   Future<void> scanItemCode(BuildContext context) async {
+    bool isConnected = await networkHelper.isConnected();
+    if (!isConnected) {
+      showErrorDialog(
+        context,
+        'Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.',
+      );
+      return;
+    }
+
     disableUnitList.clear();
     unitList.clear();
     selectedProductUnit = "";
+    barCodeController.clear();
+    isBarcodeEnable = true;
     notifyListeners();
+
     var res = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const SimpleBarcodeScannerPage(),
       ),
     );
+
     if (res is String) {
       final scanValue = handleScanResult(res, context);
       itemCodeController.text = scanValue;
       if (scanValue.isNotEmpty) {
         await getUnitById(scanValue);
+
+        if (unitList.isNotEmpty) {
+          final listData = await getProductsById(scanValue);
+          if (listData.isNotEmpty) {
+            barCodeController.text = listData.first.barCode;
+            isBarcodeEnable = false;
+          }
+        }
       }
       notifyListeners();
     }
   }
 
   Future<void> scanBarCode(BuildContext context) async {
+    bool isConnected = await networkHelper.isConnected();
+    if (!isConnected) {
+      showErrorDialog(
+        context,
+        'Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.',
+      );
+      return;
+    }
+
     if (!isBarcodeEnable) {
       showErrorDialog(
         context,
@@ -210,7 +242,6 @@ class CreateItemProvider extends ChangeNotifier {
       if (res == '-1') {
         barCodeController.text = "";
         notifyListeners();
-
         showErrorDialog(context, 'Có lỗi xảy ra khi quét Barcode');
       }
     }
@@ -309,9 +340,15 @@ class CreateItemProvider extends ChangeNotifier {
     try {
       if (formKey.currentState?.validate() == true &&
           selectedProductUnit.isNotEmpty) {
-        final bool result = await createItem();
-        if (result) {
-          Navigator.pop(context, 'refresh');
+        bool isConnected = await networkHelper.isConnected();
+        if (isConnected) {
+          final bool result = await createItem();
+          if (result) {
+            Navigator.pop(context, 'refresh');
+          }
+        } else {
+          showErrorDialog(context,
+              'Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.');
         }
       } else {
         showErrorDialog(context, 'Lỗi, xin hãy kiểm tra lại các trường');
@@ -319,7 +356,7 @@ class CreateItemProvider extends ChangeNotifier {
     } catch (e) {
       showErrorDialog(context, 'Lỗi xảy ra: $e');
     } finally {
-      setLoading(false); // This will always be called
+      setLoading(false);
     }
   }
 
@@ -364,8 +401,6 @@ class CreateItemProvider extends ChangeNotifier {
       debugPrint('Error creating item: $e');
       return false;
     }
-
-    return uploadImage(104);
   }
 
   Future<bool> uploadImage(int productId) async {
@@ -374,14 +409,12 @@ class CreateItemProvider extends ChangeNotifier {
 
   void showErrorDialog(BuildContext context, String message) {
     DialogHelper.showErrorDialog(
-      context: context,
       message: message,
     );
   }
 
   void showSuccessDialog(BuildContext context, String message) {
     DialogHelper.showSuccessDialog(
-      context: context,
       message: message,
     );
   }

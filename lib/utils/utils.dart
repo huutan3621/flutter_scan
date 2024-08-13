@@ -31,7 +31,6 @@ class Utils {
     final context = navigatorKey.currentContext;
     if (context != null) {
       DialogHelper.showErrorDialog(
-        context: context,
         message: message,
       );
     } else {
