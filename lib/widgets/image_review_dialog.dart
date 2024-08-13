@@ -89,7 +89,7 @@ class ImagePreviewDialog extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).pop();
               },
-              title: "Close",
+              title: "Đóng",
               margin: const EdgeInsets.all(16),
             ),
           ],

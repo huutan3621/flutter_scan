@@ -69,10 +69,10 @@ class _CustomValidateDropDownState extends State<CustomValidateDropDown> {
   String? _validate() {
     if (widget.isRequired) {
       if (list.isEmpty) {
-        return 'No options available';
+        return 'Không có đơn vị khả dụng';
       }
       if (dropdownValue == null || dropdownValue!.isEmpty) {
-        return 'This field is required';
+        return 'Trường này bắt buộc nhập';
       }
     }
     if (widget.validator != null) {

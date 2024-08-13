@@ -30,6 +30,7 @@ class ApiService {
         final responseData = ResponseModel.fromJson(response.data);
         return responseData.products;
       } else {
+        _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
         throw Exception(
             'Failed to load products. Status code: ${response.statusCode}');
       }
@@ -54,6 +55,7 @@ class ApiService {
             .map((jsonItem) => ProductModel.fromJson(jsonItem))
             .toList();
       } else {
+        _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
         throw Exception(
             'Failed to load products. Status code: ${response.statusCode}');
       }
@@ -77,6 +79,7 @@ class ApiService {
         final List<dynamic> jsonResult = response.data;
         return jsonResult.map((item) => item.toString()).toList();
       } else {
+        _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
         throw Exception(
             'Failed to load units. Status code: ${response.statusCode}');
       }
@@ -100,12 +103,12 @@ class ApiService {
       if (response.statusCode == 200) {
         return ProductModel.fromJson(response.data);
       } else {
+        _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
         throw Exception(
             'Failed to create item. Status code: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      _handleErrorDialog(
-          "Error. Please try again: ${e.response?.statusMessage}");
+      _handleErrorDialog("Có lỗi xã ra. Mã lỗi: ${e.response?.statusMessage}");
       rethrow;
     } catch (e) {
       debugPrint('Error creating item: $e');
@@ -176,6 +179,7 @@ class ApiService {
         // _handleSuccessDialog("Upload image successfully");
         return true;
       } else {
+        _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
         debugPrint(
             'Failed to update product image. Status code: ${response.statusCode}');
         debugPrint('Response body: ${response.data}');
@@ -183,10 +187,10 @@ class ApiService {
       }
     } on DioException catch (e) {
       _handleErrorDialog(e.response?.data);
-      rethrow;
+      return false;
     } catch (e) {
       debugPrint('Error updating product image: $e');
-      rethrow;
+      return false;
     }
   }
 
@@ -205,10 +209,8 @@ class ApiService {
         },
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response data: ${response.data}');
       if (response.statusCode == 200) {
-        _handleSuccessDialog("Delete successfully");
+        _handleSuccessDialog("Xoá thành công");
         return true;
       } else {
         debugPrint('Failed to delete. Status code: ${response.statusCode}');

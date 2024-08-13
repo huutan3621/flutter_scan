@@ -56,7 +56,7 @@ class _HomeChildState extends State<HomeChild> {
           isLoading: value.isLoading,
           child: Scaffold(
             appBar: AppBar(
-              title: const Text('Item List'),
+              title: const Text('Danh sách'),
               actions: [
                 Visibility(
                   visible: value.textController.text != "",
@@ -66,6 +66,25 @@ class _HomeChildState extends State<HomeChild> {
                   ),
                 ),
               ],
+            ),
+            bottomNavigationBar: BottomAppBar(
+              height: MediaQuery.of(context).size.height / 5.5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomButton(
+                    onTap: () async {
+                      value.navigateToCreateScreen(context);
+                    },
+                    title: 'Cập nhật',
+                    btnColor: Colors.green[300],
+                  ),
+                  CustomButton(
+                    onTap: () async {},
+                    title: 'Cập nhật và tạo mới',
+                  ),
+                ],
+              ),
             ),
             body: SingleChildScrollView(
               scrollDirection: Axis.vertical,
@@ -100,13 +119,13 @@ class _HomeChildState extends State<HomeChild> {
                             },
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () {
-                            value.navigateToCreateScreen(context);
-                          },
-                          child: const Text('Create'),
-                        ),
+                        // const SizedBox(width: 8),
+                        // CustomButton(
+                        //   onTap: () {
+                        //     value.navigateToCreateScreen(context);
+                        //   },
+                        //   title: 'Tạo mới',
+                        // ),
                       ],
                     ),
                   ),
@@ -125,12 +144,7 @@ class _HomeChildState extends State<HomeChild> {
                           DataColumn(
                             label: Container(
                               padding: const EdgeInsets.all(8.0),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              child: const Text('Item Code',
+                              child: const Text('Xoá',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                             ),
@@ -138,7 +152,7 @@ class _HomeChildState extends State<HomeChild> {
                           DataColumn(
                             label: Container(
                               padding: const EdgeInsets.all(8.0),
-                              child: const Text('Bar Code',
+                              child: const Text('SKU',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                             ),
@@ -146,7 +160,7 @@ class _HomeChildState extends State<HomeChild> {
                           DataColumn(
                             label: Container(
                               padding: const EdgeInsets.all(8.0),
-                              child: const Text('Unit',
+                              child: const Text('Barcode',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                             ),
@@ -154,7 +168,7 @@ class _HomeChildState extends State<HomeChild> {
                           DataColumn(
                             label: Container(
                               padding: const EdgeInsets.all(8.0),
-                              child: const Text('Length (mm)',
+                              child: const Text('Đơn vị',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                             ),
@@ -162,7 +176,7 @@ class _HomeChildState extends State<HomeChild> {
                           DataColumn(
                             label: Container(
                               padding: const EdgeInsets.all(8.0),
-                              child: const Text('Width (mm)',
+                              child: const Text('Độ dài (mm)',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                             ),
@@ -170,7 +184,7 @@ class _HomeChildState extends State<HomeChild> {
                           DataColumn(
                             label: Container(
                               padding: const EdgeInsets.all(8.0),
-                              child: const Text('Height (mm)',
+                              child: const Text('Chiều rộng (mm)',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                             ),
@@ -178,7 +192,7 @@ class _HomeChildState extends State<HomeChild> {
                           DataColumn(
                             label: Container(
                               padding: const EdgeInsets.all(8.0),
-                              child: const Text('Weight (mg)',
+                              child: const Text('Chiều cao (mm)',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                             ),
@@ -186,7 +200,15 @@ class _HomeChildState extends State<HomeChild> {
                           DataColumn(
                             label: Container(
                               padding: const EdgeInsets.all(8.0),
-                              child: const Text('Image',
+                              child: const Text('Cân nặng (mg)',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Text('Hình ảnh',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                             ),
@@ -203,7 +225,7 @@ class _HomeChildState extends State<HomeChild> {
                                       Container(
                                         padding: const EdgeInsets.all(16),
                                         child: const Center(
-                                          child: Text("No data available",
+                                          child: Text("Không có dữ liệu",
                                               style: TextStyle(
                                                   fontSize: 16,
                                                   color: Colors.red)),

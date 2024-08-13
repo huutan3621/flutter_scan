@@ -74,7 +74,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
             isLoading: value.isLoading,
             child: Scaffold(
               appBar: AppBar(
-                title: const Text('Create Item'),
+                title: const Text('Cập nhật sản phẩm'),
               ),
               body: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -94,7 +94,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'This field is required';
+                              return 'Trường này bắt buộc nhập';
                             }
                             return null;
                           },
@@ -110,13 +110,13 @@ class _CreateItemChildState extends State<CreateItemChild> {
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'This field is required';
+                              return 'Trường này bắt buộc nhập';
                             }
                             return null;
                           },
                         ),
                         CustomValidateDropDown(
-                          label: "Unit",
+                          label: "Đơn vị",
                           selectedItem: value.selectedProductUnit,
                           itemList: value.unitList,
                           disabledItemList: value.disableUnitList ?? [],
@@ -126,10 +126,10 @@ class _CreateItemChildState extends State<CreateItemChild> {
                           },
                           validator: (selectedUnit) {
                             if (value.unitList.isEmpty) {
-                              return 'No options available';
+                              return 'Không có đơn vị khả dụng';
                             }
                             if (selectedUnit == null || selectedUnit.isEmpty) {
-                              return 'This field is required';
+                              return 'Trường này bắt buộc nhập';
                             }
                             return null;
                           },
@@ -137,7 +137,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         ),
                         SelectUnitTextFormField(
                           controller: value.lengthController,
-                          label: "Length",
+                          label: "Độ dài",
                           unit: value.selectedLengthUnit,
                           selectedUnit: value.selectedLengthUnit,
                           callback: (previousValue, currentValue) {
@@ -149,7 +149,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         ),
                         SelectUnitTextFormField(
                           controller: value.widthController,
-                          label: "Width",
+                          label: "Chiều rộng",
                           unit: value.selectedLengthUnit,
                           selectedUnit: value.selectedLengthUnit,
                           callback: (previousValue, currentValue) {
@@ -161,7 +161,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         ),
                         SelectUnitTextFormField(
                           controller: value.heightController,
-                          label: "Height",
+                          label: "Chiều cao",
                           unit: value.selectedLengthUnit,
                           selectedUnit: value.selectedLengthUnit,
                           callback: (previousValue, currentValue) {
@@ -173,7 +173,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                         ),
                         SelectUnitTextFormField(
                           controller: value.weightController,
-                          label: "Weight",
+                          label: "Cân nặng",
                           unit: value.selectedWeightUnit,
                           selectedUnit: value.selectedWeightUnit,
                           callback: (previousValue, currentValue) {
@@ -244,7 +244,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                           },
                         );
                       },
-                      title: 'Import Image',
+                      title: 'Thêm ảnh',
                       btnColor: Colors.green[300],
                     ),
                     CustomButton(
@@ -253,7 +253,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                           value.onSubmit(context);
                         }
                       },
-                      title: 'Submit',
+                      title: 'Cập nhật',
                     ),
                   ],
                 ),
@@ -278,7 +278,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
             onTap: () async {
               value.chooseImageFromGallery(context);
             },
-            title: 'Pick Image',
+            title: 'Thư viện',
             btnColor: Colors.green[300],
           ),
           const SizedBox(height: 16),
@@ -286,7 +286,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
             onTap: () async {
               value.chooseImageFromCamera(context);
             },
-            title: 'Camera',
+            title: 'Máy ảnh',
             btnColor: Colors.blue[400],
           ),
         ],

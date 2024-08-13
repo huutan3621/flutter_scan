@@ -79,26 +79,20 @@ class CreateItemProvider extends ChangeNotifier {
   Future<void> getUnitById(String itemNumber) async {
     setLoading(true);
 
-    try {
-      unitList = await apiService.getUnitById(itemNumber);
+    unitList = await apiService.getUnitById(itemNumber);
 
-      if (unitList.isNotEmpty) {
-        final disableUnitSet = disableUnitList.toSet();
-        final availableUnits =
-            unitList.where((unit) => !disableUnitSet.contains(unit)).toList();
-        selectedProductUnit = availableUnits.first;
-        print('Available units: $availableUnits');
-      }
-
-      if (isItemCodeScanEnabled) {
-        await getDisableUnit(itemNumber);
-      }
-    } catch (e) {
-      print('Error fetching units: $e');
-    } finally {
-      setLoading(false);
-      notifyListeners();
+    if (unitList.isNotEmpty && isItemCodeScanEnabled == false) {
+      final disableUnitSet = disableUnitList.toSet();
+      final availableUnits =
+          unitList.where((unit) => disableUnitSet.contains(unit)).toList();
+      selectedProductUnit = availableUnits.first;
+      print('Available units: $availableUnits');
+    } else if (unitList.isNotEmpty && isItemCodeScanEnabled == true) {
+      await getDisableUnit(itemNumber);
     }
+
+    setLoading(false);
+    notifyListeners();
   }
 
   Future<List<ProductModel>> getProductsById(String itemNumber) async {
@@ -165,6 +159,10 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   Future<void> scanItemCode(BuildContext context) async {
+    disableUnitList.clear();
+    unitList.clear();
+    selectedProductUnit = "";
+    notifyListeners();
     var res = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -216,7 +214,7 @@ class CreateItemProvider extends ChangeNotifier {
     if (images.length >= 5) {
       _showDialog(
         context,
-        'Maximum 5 images allowed',
+        'Chỉ cho phép tối đa 5 ảnh',
       );
       return;
     }
@@ -237,7 +235,7 @@ class CreateItemProvider extends ChangeNotifier {
       } else {
         _showDialog(
           context,
-          'Image size must be less than 2MB',
+          'Dung lượng ảnh phải dưới 2MB',
         );
       }
     }
@@ -249,7 +247,7 @@ class CreateItemProvider extends ChangeNotifier {
       } else {
         _showDialog(
           context,
-          'Cannot add more than 5 images in total',
+          'Không thể thêm hơn 5 ảnh',
         );
       }
     }
@@ -282,7 +280,7 @@ class CreateItemProvider extends ChangeNotifier {
       } else {
         _showDialog(
           context,
-          'Image size must be less than 2MB',
+          'Dung lượng ảnh phải dưới 2MB',
         );
       }
     }
@@ -297,21 +295,21 @@ class CreateItemProvider extends ChangeNotifier {
   void onSubmit(BuildContext context) async {
     setLoading(true);
 
-    if (formKey.currentState?.validate() == true &&
-        selectedProductUnit.isNotEmpty) {
-      try {
+    try {
+      if (formKey.currentState?.validate() == true &&
+          selectedProductUnit.isNotEmpty) {
         final bool result = await createItem();
         if (result) {
-          _showSuccessDialog(context, 'Create successfully');
+          Navigator.pop(context, 'refresh');
         }
-      } catch (e) {
-        _showDialog(context, 'Error. An exception occurred: $e');
+      } else {
+        _showDialog(context, 'Lỗi, xin hãy kiểm tra lại các trường');
       }
-    } else {
-      _showDialog(context, 'Error. Please check the form again');
+    } catch (e) {
+      _showDialog(context, 'Lỗi xảy ra: $e');
+    } finally {
+      setLoading(false); // This will always be called
     }
-
-    setLoading(false);
   }
 
   Future<bool> createItem() async {
@@ -355,6 +353,8 @@ class CreateItemProvider extends ChangeNotifier {
       debugPrint('Error creating item: $e');
       return false;
     }
+
+    return uploadImage(104);
   }
 
   Future<bool> uploadImage(int productId) async {

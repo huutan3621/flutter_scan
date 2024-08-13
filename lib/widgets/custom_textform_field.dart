@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 
 class SelectUnitTextFormField extends StatefulWidget {
@@ -13,6 +14,7 @@ class SelectUnitTextFormField extends StatefulWidget {
   final FormFieldValidator<String>? validator;
   final bool? isRequired;
   final String? selectedUnit;
+  final List<TextInputFormatter>? inputFormatters;
   const SelectUnitTextFormField({
     super.key,
     required this.label,
@@ -26,6 +28,7 @@ class SelectUnitTextFormField extends StatefulWidget {
     this.validator,
     this.isRequired = false,
     this.selectedUnit,
+    this.inputFormatters,
   });
 
   @override
@@ -73,7 +76,7 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
       } else {
         DialogHelper.showErrorDialog(
             context: context,
-            message: 'Please enter a valid integer before changing the unit.');
+            message: 'Xin hãy nhập số nguyên trước khi đổi đơn vị');
       }
     }
   }
@@ -84,6 +87,8 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
       controller: widget.controller,
       obscureText: widget.obscureText,
       keyboardType: widget.keyboardType ?? TextInputType.number,
+      inputFormatters: widget.inputFormatters ??
+          <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly], //
       decoration: InputDecoration(
         suffixIcon: widget.iconButton ??
             DropdownButton<String>(
@@ -104,10 +109,10 @@ class _SelectUnitTextFormFieldState extends State<SelectUnitTextFormField> {
       validator: widget.isRequired == true
           ? (value) {
               if (value == null || value.isEmpty) {
-                return 'This field is required';
+                return 'Trường này bắt buộc nhập';
               }
               if (int.tryParse(value) == null) {
-                return 'Please enter a valid integer';
+                return 'Xin hãy nhập số nguyên';
               }
               return null;
             }
