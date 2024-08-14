@@ -72,16 +72,16 @@ class _HomeChildState extends State<HomeChild> {
                 children: [
                   CustomButton(
                     onTap: () async {
-                      value.navigateToCreateScreen(context);
+                      value.updateTable(context);
                     },
                     title: 'Cập nhật',
                     btnColor: Colors.green[300],
                   ),
                   CustomButton(
                     onTap: () async {
-                      value.cleanAndNavigateToCreateScreen(context);
+                      value.cleanTable(context);
                     },
-                    title: 'Cập nhật và tạo mới',
+                    title: 'Tạo mới',
                   ),
                 ],
               ),

@@ -112,7 +112,8 @@ class CreateItemProvider extends ChangeNotifier {
 
       if (listData.isEmpty) {
         disableUnitList = [];
-        selectedProductUnit = '';
+        selectedProductUnit = unitList.first;
+        notifyListeners();
         return;
       }
 
@@ -344,7 +345,7 @@ class CreateItemProvider extends ChangeNotifier {
         if (isConnected) {
           final bool result = await createItem();
           if (result) {
-            Navigator.pop(context, 'refresh');
+            Navigator.pop(context, itemCodeController.text);
           }
         } else {
           showErrorDialog(context,

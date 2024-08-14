@@ -113,7 +113,7 @@ class HomeProvider extends ChangeNotifier {
     return unitsInList.intersection(allUnits).toList();
   }
 
-  Future<void> cleanAndNavigateToCreateScreen(BuildContext context) async {
+  Future<void> cleanTable(BuildContext context) async {
     bool isConnected = await networkHelper.isConnected();
     debugPrint('Network connected: $isConnected');
 
@@ -132,6 +132,36 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> updateTable(BuildContext context) async {
+    bool isConnected = await networkHelper.isConnected();
+    debugPrint('Network connected: $isConnected');
+
+    if (scanResult.isNotEmpty) {
+      if (isConnected) {
+        if (dataList.isNotEmpty) {
+          await checkNavigate(context);
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CreateItemScreen(),
+            ),
+          );
+        }
+      } else {
+        debugPrint('No network connection. Showing error dialog.');
+        DialogHelper.showErrorDialog(
+          message:
+              "Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
+        );
+      }
+    } else {
+      DialogHelper.showErrorDialog(
+        message: "Không có SKU để cập nhật",
+      );
+    }
+  }
+
   Future<void> navigateToCreateScreen(BuildContext context) async {
     bool isConnected = await networkHelper.isConnected();
     debugPrint('Network connected: $isConnected');
@@ -140,12 +170,18 @@ class HomeProvider extends ChangeNotifier {
       if (dataList.isNotEmpty) {
         await checkNavigate(context);
       } else {
-        Navigator.push(
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => const CreateItemScreen(),
           ),
         );
+        if (result.isNotEmpty) {
+          await _fetchData(result, context);
+          scanResult = result;
+          textController.text = result;
+          notifyListeners();
+        }
       }
     } else {
       debugPrint('No network connection. Showing error dialog.');
@@ -178,8 +214,11 @@ class HomeProvider extends ChangeNotifier {
             ),
           ),
         );
-        if (result == 'refresh' && scanResult.isNotEmpty) {
-          await _fetchData(scanResult, context);
+        if (result.isNotEmpty) {
+          await _fetchData(result, context);
+          scanResult = result;
+          textController.text = result;
+          notifyListeners();
         }
       } else if (scanResult.isNotEmpty) {
         DialogHelper.showErrorDialog(
@@ -198,8 +237,11 @@ class HomeProvider extends ChangeNotifier {
           ),
         ),
       );
-      if (result == 'refresh' && scanResult.isNotEmpty) {
-        await _fetchData(scanResult, context);
+      if (result.isNotEmpty) {
+        await _fetchData(result, context);
+        scanResult = result;
+        textController.text = result;
+        notifyListeners();
       }
     } else {
       DialogHelper.showErrorDialog(message: "Tất cả đơn vị đã có giá trị");
@@ -233,8 +275,11 @@ class HomeProvider extends ChangeNotifier {
                 ),
               ),
             );
-            if (result == 'refresh' && scanResult.isNotEmpty) {
-              await _fetchData(scanResult, context);
+            if (result.isNotEmpty) {
+              await _fetchData(result, context);
+              scanResult = result;
+              textController.text = result;
+              notifyListeners();
             }
           }
         } else if (!containsAllUnits()) {
@@ -250,8 +295,11 @@ class HomeProvider extends ChangeNotifier {
               ),
             ),
           );
-          if (result == 'refresh' && scanResult.isNotEmpty) {
-            await _fetchData(scanResult, context);
+          if (result.isNotEmpty) {
+            await _fetchData(result, context);
+            scanResult = result;
+            textController.text = result;
+            notifyListeners();
           }
         }
       } finally {

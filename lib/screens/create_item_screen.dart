@@ -67,7 +67,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
       builder: (context, value, child) {
         return WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context, 'refresh');
+            Navigator.pop(context, value.itemCodeController.text);
             return false;
           },
           child: CustomLoadingOverlay(
