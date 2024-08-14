@@ -27,6 +27,8 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<void> onRefresh(BuildContext context) async {
+    dataList.clear();
+    unitList.clear();
     await _fetchData(scanResult, context);
   }
 
@@ -141,12 +143,32 @@ class HomeProvider extends ChangeNotifier {
         if (dataList.isNotEmpty) {
           await checkNavigate(context);
         } else {
-          Navigator.push(
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const CreateItemScreen(),
+              builder: (context) => CreateItemScreen(
+                itemCode: scanResult,
+                product: ProductModel(
+                  itemCode: scanResult,
+                  barCode: '',
+                  unitOfMeasure: unitList.first,
+                  length: 0,
+                  width: 0,
+                  height: 0,
+                  weight: 0,
+                  createBy: '',
+                  createDate: DateTime.now(),
+                  images: [],
+                ),
+              ),
             ),
           );
+          if (result.isNotEmpty) {
+            await _fetchData(result, context);
+            scanResult = result;
+            textController.text = result;
+            notifyListeners();
+          }
         }
       } else {
         debugPrint('No network connection. Showing error dialog.');
@@ -322,8 +344,7 @@ class HomeProvider extends ChangeNotifier {
     );
   }
 
-  showAlertDialog(BuildContext context, String itemCode, String barCode,
-      String unitOfMeasure) {
+  showAlertDialog(BuildContext context, int productId) {
     Widget cancelButton = CustomButton(
       title: "Bỏ qua",
       btnColor: Colors.blue[400],
@@ -335,7 +356,7 @@ class HomeProvider extends ChangeNotifier {
       title: "Xác nhận",
       btnColor: Colors.red[400],
       onTap: () {
-        blockData(itemCode, barCode, unitOfMeasure, context);
+        blockData(productId, context);
         Navigator.of(context).pop();
       },
     );
@@ -358,11 +379,9 @@ class HomeProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> blockData(String itemCode, String barCode, String unitOfMeasure,
-      BuildContext context) async {
+  Future<void> blockData(int productId, BuildContext context) async {
     if (await networkHelper.isConnected()) {
-      final result =
-          await apiService.blockData(itemCode, barCode, unitOfMeasure);
+      final result = await apiService.blockData(productId);
       if (result) {
         await onRefresh(context);
       }

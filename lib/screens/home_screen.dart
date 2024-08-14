@@ -246,11 +246,8 @@ class _HomeChildState extends State<HomeChild> {
                                               value.showAlertDialog(
                                                   context,
                                                   value.dataList[rowIndex]
-                                                      .itemCode,
-                                                  value.dataList[rowIndex]
-                                                      .barCode,
-                                                  value.dataList[rowIndex]
-                                                      .unitOfMeasure);
+                                                          .productId ??
+                                                      0);
                                             },
                                             child: Container(
                                               padding: const EdgeInsets.all(8),

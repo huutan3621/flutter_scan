@@ -43,24 +43,23 @@ class ApiService {
     }
   }
 
-  Future<bool> _checkNetworkConnection() async {
-    var connectivityResult = await connectivity.checkConnectivity();
-    if (connectivityResult == ConnectivityResult.none) {
-      _handleErrorDialog(
-          "Không có kết nối mạng. Vui lòng kiểm tra lại kết nối.");
-      return false;
-    }
-    return true;
-  }
-
   Future<T> _retry<T>(Future<T> Function() action) async {
     int attempt = 0;
     while (attempt < retryCount) {
       try {
         return await action();
+      } on DioException catch (e) {
+        attempt++;
+        if (attempt == retryCount) {
+          _handleDioError(e);
+          rethrow;
+        }
       } catch (e) {
         attempt++;
-        if (attempt == retryCount) rethrow;
+        if (attempt == retryCount) {
+          debugPrint('Unexpected error: $e');
+          rethrow; // rethrow unexpected errors
+        }
       }
     }
     return Future.error('Retry failed');
@@ -80,8 +79,6 @@ class ApiService {
 
   Future<List<ProductModel>> getProducts(
       {int pageNumber = 1, int pageSize = 10}) async {
-    if (!await _checkNetworkConnection()) return [];
-
     return _retry(() async {
       _logRequest('$baseUrl/api/ScanProduct/get-scan-product-data', {
         'pageNumber': pageNumber,
@@ -111,8 +108,6 @@ class ApiService {
   }
 
   Future<List<ProductModel>> getProductsById(String itemNumber) async {
-    if (!await _checkNetworkConnection()) return [];
-
     return _retry(() async {
       _logRequest(
           '$baseUrl/api/ScanProduct/get-scan-product-data-by-item-number/$itemNumber',
@@ -140,8 +135,6 @@ class ApiService {
   }
 
   Future<List<String>> getUnitById(String itemNumber) async {
-    if (!await _checkNetworkConnection()) return [];
-
     return _retry(() async {
       _logRequest(
           '$baseUrl/api/ScanProduct/get-unit-measure-by-item-number/$itemNumber',
@@ -166,10 +159,6 @@ class ApiService {
   }
 
   Future<ProductModel> createItem(ProductModel body) async {
-    if (!await _checkNetworkConnection()) {
-      throw NetworkException("No network connection");
-    }
-
     return _retry(() async {
       _logRequest('$baseUrl/api/ScanProduct/create-scan-product-data', body);
 
@@ -192,15 +181,8 @@ class ApiService {
   }
 
   Future<bool> updateProductImage(int productId, List<XFile> images) async {
-    if (!await _checkNetworkConnection()) return false;
-
     return _retry(() async {
-      _logRequest('$baseUrl/api/ScanProduct/update-scan-product-image', {
-        'productId': productId.toString(),
-        'files': images,
-      });
-
-      FormData formData = FormData.fromMap({
+      final formData = FormData.fromMap({
         'productId': productId.toString(),
         'files': await Future.wait(images.map((file) async {
           final fileName = file.path.split('/').last;
@@ -226,27 +208,14 @@ class ApiService {
     });
   }
 
-  Future<bool> blockData(
-      String itemCode, String barCode, String unitOfMeasure) async {
-    if (!await _checkNetworkConnection()) return false;
-
-    final url = '$baseUrl/api/ScanProduct/block-scan-product-data';
+  Future<bool> blockData(int productId) async {
+    final url =
+        '$baseUrl/api/ScanProduct/block-scan-product-data?productId=$productId';
 
     return _retry(() async {
-      _logRequest(url, {
-        'itemCode': itemCode,
-        'barCode': barCode,
-        'unitOfMeasure': unitOfMeasure,
-      });
+      _logRequest(url, null);
 
-      final response = await dio.post(
-        url,
-        queryParameters: {
-          'itemCode': itemCode,
-          'barCode': barCode,
-          'unitOfMeasure': unitOfMeasure,
-        },
-      );
+      final response = await dio.post(url);
 
       _logResponse(response);
 
@@ -283,12 +252,37 @@ class ApiService {
   }
 
   void _handleDioError(DioException e) {
-    debugPrint('Dio error: ${e.message}');
     final context = navigatorKey.currentContext;
+    String message;
+
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+        message = 'Connection timeout, please try again.';
+        break;
+      case DioExceptionType.sendTimeout:
+        message = 'Send timeout, please try again.';
+        break;
+      case DioExceptionType.receiveTimeout:
+        message = 'Receive timeout, please try again.';
+        break;
+      case DioExceptionType.badResponse:
+        message =
+            'Server error: ${e.response?.statusCode} ${e.response?.statusMessage}';
+        break;
+      case DioExceptionType.cancel:
+        message = 'Request canceled.';
+        break;
+      case DioExceptionType.unknown:
+      default:
+        message = e.message ?? 'Unknown error occurred.';
+        break;
+    }
+
+    debugPrint('Dio error: $message');
     if (context != null) {
       DialogHelper.showDioErrorDialog(
         statusCode: e.response?.statusCode,
-        message: e.message ?? 'Unknown error occurred',
+        message: message,
         response: e.response?.data,
       );
     } else {

@@ -3,12 +3,19 @@ import 'package:flutter_scanner_app/utils/enum.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/service/api_service.dart';
 import 'package:flutter_scanner_app/utils/network_helper.dart';
+import 'package:flutter_scanner_app/utils/permission.dart';
 import 'package:flutter_scanner_app/utils/unit_utils.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 import 'package:flutter_scanner_app/widgets/image_review_dialog.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CreateItemProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
@@ -117,6 +124,8 @@ class CreateItemProvider extends ChangeNotifier {
         return;
       }
 
+      barCodeController.text = listData.first.barCode;
+      isBarcodeEnable = false;
       disableUnitList = getSelectedUnits(listData);
 
       if (disableUnitList.isNotEmpty) {
@@ -253,7 +262,95 @@ class CreateItemProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void chooseImageFromGallery(BuildContext context) async {
+  // void chooseImageFromGallery(BuildContext context) async {
+  //   if (images.length >= 5) {
+  //     showErrorDialog(
+  //       context,
+  //       'Chỉ cho phép tối đa 5 ảnh',
+  //     );
+  //     return;
+  //   }
+
+  //   final List<XFile> pickedFiles = await picker.pickMultiImage(
+  //     maxWidth: 1024,
+  //     maxHeight: 1024,
+  //     imageQuality: 80,
+  //   );
+
+  //   final List<XFile> validImages = [];
+
+  //   for (final pickedFile in pickedFiles) {
+  //     final fileSize = await pickedFile.length();
+
+  //     if (fileSize <= 2 * 1024 * 1024) {
+  //       validImages.add(pickedFile);
+  //     } else {
+  //       showErrorDialog(
+  //         context,
+  //         'Dung lượng ảnh phải dưới 2MB',
+  //       );
+  //     }
+  //   }
+
+  //   if (validImages.isNotEmpty) {
+  //     if (images.length + validImages.length <= 5) {
+  //       images.addAll(validImages);
+  //       notifyListeners();
+  //     } else {
+  //       showErrorDialog(
+  //         context,
+  //         'Không thể thêm hơn 5 ảnh',
+  //       );
+  //     }
+  //   }
+
+  //   Navigator.pop(context);
+  // }
+
+  // Future<void> chooseImageFromCamera(BuildContext context) async {
+  //   if (images.length >= 5) {
+  //     showErrorDialog(
+  //       context,
+  //       'Maximum 5 images allowed',
+  //     );
+  //     return;
+  //   }
+
+  //   final picker = ImagePicker();
+  //   final pickedFile = await picker.pickImage(
+  //     source: ImageSource.camera,
+  //     maxWidth: 1024,
+  //     maxHeight: 1024,
+  //     imageQuality: 80,
+  //   );
+
+  //   if (pickedFile != null) {
+  //     final fileSize = await pickedFile.length();
+
+  //     if (fileSize <= 2 * 1024 * 1024) {
+  //       final tempDir = pickedFile.path;
+  //       final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+  //       final tempFile = File('$tempDir/$fileName');
+
+  //       final originalFile = File(pickedFile.path);
+  //       await originalFile.copy(tempFile.path);
+
+  //       // Use the copied file
+  //       final xFile = XFile(tempFile.path);
+
+  //       images.add(xFile);
+  //       notifyListeners();
+  //     } else {
+  //       showErrorDialog(
+  //         context,
+  //         'Dung lượng ảnh phải dưới 2MB',
+  //       );
+  //     }
+  //   }
+  //   Navigator.pop(context);
+  // }
+
+  Future<void> chooseImageFromGallery(BuildContext context) async {
     if (images.length >= 5) {
       showErrorDialog(
         context,
@@ -268,41 +365,47 @@ class CreateItemProvider extends ChangeNotifier {
       imageQuality: 80,
     );
 
-    final List<XFile> validImages = [];
+    if (pickedFiles.isNotEmpty) {
+      final List<XFile> validImages = [];
 
-    for (final pickedFile in pickedFiles) {
-      final fileSize = await pickedFile.length();
+      for (final pickedFile in pickedFiles) {
+        final fileSize = await pickedFile.length();
 
-      if (fileSize <= 2 * 1024 * 1024) {
-        validImages.add(pickedFile);
-      } else {
-        showErrorDialog(
-          context,
-          'Dung lượng ảnh phải dưới 2MB',
-        );
+        if (fileSize <= 2 * 1024 * 1024) {
+          final savedFile = await _saveImageToAppDirectory(pickedFile);
+          if (savedFile != null) {
+            validImages.add(savedFile);
+          }
+        } else {
+          showErrorDialog(
+            context,
+            'Dung lượng ảnh phải dưới 2MB',
+          );
+        }
+      }
+
+      if (validImages.isNotEmpty) {
+        if (images.length + validImages.length <= 5) {
+          images.addAll(validImages);
+          notifyListeners();
+        } else {
+          showErrorDialog(
+            context,
+            'Không thể thêm hơn 5 ảnh',
+          );
+        }
       }
     }
-
-    if (validImages.isNotEmpty) {
-      if (images.length + validImages.length <= 5) {
-        images.addAll(validImages);
-        notifyListeners();
-      } else {
-        showErrorDialog(
-          context,
-          'Không thể thêm hơn 5 ảnh',
-        );
-      }
-    }
+    notifyListeners();
 
     Navigator.pop(context);
   }
 
-  void chooseImageFromCamera(BuildContext context) async {
+  Future<void> chooseImageFromCamera(BuildContext context) async {
     if (images.length >= 5) {
       showErrorDialog(
         context,
-        'Maximum 5 images allowed',
+        'Chỉ cho phép tối đa 5 ảnh',
       );
       return;
     }
@@ -318,8 +421,11 @@ class CreateItemProvider extends ChangeNotifier {
       final fileSize = await pickedFile.length();
 
       if (fileSize <= 2 * 1024 * 1024) {
-        images.add(pickedFile);
-        notifyListeners();
+        final savedFile = await _saveImageToAppDirectory(pickedFile);
+        if (savedFile != null) {
+          images.add(savedFile);
+          notifyListeners();
+        }
       } else {
         showErrorDialog(
           context,
@@ -327,7 +433,27 @@ class CreateItemProvider extends ChangeNotifier {
         );
       }
     }
+    notifyListeners();
+
     Navigator.pop(context);
+  }
+
+  Future<XFile?> _saveImageToAppDirectory(XFile pickedFile) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final filePath = join(directory.path, fileName);
+      final File newFile = File(filePath);
+
+      // Copy the file to the new location
+      final File originalFile = File(pickedFile.path);
+      await originalFile.copy(newFile.path);
+
+      return XFile(newFile.path);
+    } catch (e) {
+      debugPrint('Error saving image: $e');
+      return null;
+    }
   }
 
   void removeImage(int index) {
