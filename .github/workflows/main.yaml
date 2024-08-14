@@ -25,7 +25,7 @@ jobs:
           architecture: x64
       - run: dart run build_runner build --delete-conflicting-outputs
       - run: echo "APP_VERSION=v1.0.${{ github.run_number }}" >> .env
-      - run: flutter build apk --release --split-per-abi
+      # - run: flutter build apk --release --split-per-abi
       - run: |
           flutter build ios --no-codesign
           cd build/ios/iphoneos
