@@ -367,6 +367,7 @@ class CreateItemProvider extends ChangeNotifier {
 
     if (pickedFiles.isNotEmpty) {
       final List<XFile> validImages = [];
+      bool showError = false;
 
       for (final pickedFile in pickedFiles) {
         final fileSize = await pickedFile.length();
@@ -377,6 +378,7 @@ class CreateItemProvider extends ChangeNotifier {
             validImages.add(savedFile);
           }
         } else {
+          showError = true;
           showErrorDialog(
             context,
             'Dung lượng ảnh phải dưới 2MB',
@@ -389,16 +391,26 @@ class CreateItemProvider extends ChangeNotifier {
           images.addAll(validImages);
           notifyListeners();
         } else {
-          showErrorDialog(
-            context,
-            'Không thể thêm hơn 5 ảnh',
-          );
+          showError = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showErrorDialog(
+              context,
+              'Không thể thêm hơn 5 ảnh',
+            );
+          });
         }
       }
-    }
-    notifyListeners();
 
-    Navigator.pop(context);
+      if (!showError) {
+        Navigator.pop(context);
+      }
+    } else {
+      showErrorDialog(
+        context,
+        'Có lỗi xảy ra khi thêm ảnh',
+      );
+      Navigator.pop(context);
+    }
   }
 
   Future<void> chooseImageFromCamera(BuildContext context) async {
