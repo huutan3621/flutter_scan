@@ -12,8 +12,11 @@ import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 class HomeProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
   final NetworkHelper networkHelper = NetworkHelper();
-  late String scanResult = '';
-  final TextEditingController textController = TextEditingController();
+  late String scanLocation = '';
+  late String scanProduct = '';
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController productController = TextEditingController();
+
   late List<ProductModel> dataList = [];
   late List<String> unitList = [];
   bool isLoading = false;
@@ -29,10 +32,10 @@ class HomeProvider extends ChangeNotifier {
   Future<void> onRefresh(BuildContext context) async {
     dataList.clear();
     unitList.clear();
-    await _fetchData(scanResult, context);
+    await _fetchData(scanLocation, context);
   }
 
-  Future<void> navigateToScanScreen(BuildContext context) async {
+  Future<void> locationToScanScreen(BuildContext context) async {
     bool isConnected = await networkHelper.isConnected();
     debugPrint('Network connected: $isConnected');
 
@@ -44,7 +47,7 @@ class HomeProvider extends ChangeNotifier {
         ),
       );
       if (res is String) {
-        handleScanResult(res, context);
+        handleScanLocation(res, context);
       }
     } else {
       debugPrint('No network connection. Showing error dialog.');
@@ -54,12 +57,55 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> handleScanResult(String result, BuildContext context) async {
-    scanResult = Utils.handleTSScanResult(result, context);
-    textController.text = scanResult;
+  Future<void> productToScanScreen(BuildContext context) async {
+    bool isConnected = await networkHelper.isConnected();
+    debugPrint('Network connected: $isConnected');
+
+    if (isConnected) {
+      if (locationController.text != "") {
+        var res = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SimpleBarcodeScannerPage(),
+          ),
+        );
+        if (res is String) {
+          handleScanProduct(res, context);
+        }
+      } else {
+        debugPrint('No location data.');
+        DialogHelper.showErrorDialog(
+          message: "Không có dữ liệu vị trí, vui lòng thử lại.",
+        );
+      }
+    } else {
+      debugPrint('No network connection. Showing error dialog.');
+      DialogHelper.showErrorDialog(
+        message: "Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
+      );
+    }
+  }
+
+  Future<void> handleScanLocation(String result, BuildContext context) async {
+    scanLocation = Utils.handleTSScanLocation(result, context);
+    locationController.text = scanLocation;
     notifyListeners();
-    if (scanResult.isNotEmpty) {
-      await _fetchData(scanResult, context);
+    if (scanLocation.isNotEmpty) {
+      await _fetchData(scanLocation, context);
+    } else {
+      dataList.clear();
+      unitList.clear();
+      notifyListeners();
+    }
+    // await checkNavigateAfterScan(context);
+  }
+
+  Future<void> handleScanProduct(String result, BuildContext context) async {
+    scanLocation = Utils.handleTSScanResult(result, context);
+    productController.text = scanLocation;
+    notifyListeners();
+    if (scanLocation.isNotEmpty) {
+      await _fetchData(scanLocation, context);
     } else {
       dataList.clear();
       unitList.clear();
@@ -93,7 +139,7 @@ class HomeProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    textController.dispose();
+    locationController.dispose();
     super.dispose();
   }
 
@@ -120,8 +166,8 @@ class HomeProvider extends ChangeNotifier {
     debugPrint('Network connected: $isConnected');
 
     if (isConnected) {
-      scanResult = "";
-      textController.clear();
+      scanLocation = "";
+      locationController.clear();
       dataList.clear();
       unitList.clear();
       notifyListeners();
@@ -138,7 +184,7 @@ class HomeProvider extends ChangeNotifier {
     bool isConnected = await networkHelper.isConnected();
     debugPrint('Network connected: $isConnected');
 
-    if (scanResult.isNotEmpty) {
+    if (scanLocation.isNotEmpty) {
       if (isConnected) {
         if (dataList.isNotEmpty) {
           await checkNavigate(context);
@@ -147,9 +193,9 @@ class HomeProvider extends ChangeNotifier {
             context,
             MaterialPageRoute(
               builder: (context) => CreateItemScreen(
-                itemCode: scanResult,
+                itemCode: scanLocation,
                 product: ProductModel(
-                  itemCode: scanResult,
+                  itemCode: scanLocation,
                   barCode: '',
                   unitOfMeasure: unitList.first,
                   length: 0,
@@ -165,8 +211,8 @@ class HomeProvider extends ChangeNotifier {
           );
           if (result.isNotEmpty) {
             await _fetchData(result, context);
-            scanResult = result;
-            textController.text = result;
+            scanLocation = result;
+            locationController.text = result;
             notifyListeners();
           }
         }
@@ -200,8 +246,8 @@ class HomeProvider extends ChangeNotifier {
         );
         if (result.isNotEmpty) {
           await _fetchData(result, context);
-          scanResult = result;
-          textController.text = result;
+          scanLocation = result;
+          locationController.text = result;
           notifyListeners();
         }
       }
@@ -221,7 +267,7 @@ class HomeProvider extends ChangeNotifier {
           MaterialPageRoute(
             builder: (context) => CreateItemScreen(
               product: ProductModel(
-                itemCode: scanResult,
+                itemCode: scanLocation,
                 barCode: '',
                 unitOfMeasure: unitList.first,
                 length: 0,
@@ -232,17 +278,17 @@ class HomeProvider extends ChangeNotifier {
                 createDate: DateTime.now(),
                 images: [],
               ),
-              itemCode: scanResult,
+              itemCode: scanLocation,
             ),
           ),
         );
         if (result.isNotEmpty) {
           await _fetchData(result, context);
-          scanResult = result;
-          textController.text = result;
+          scanLocation = result;
+          locationController.text = result;
           notifyListeners();
         }
-      } else if (scanResult.isNotEmpty) {
+      } else if (scanLocation.isNotEmpty) {
         DialogHelper.showErrorDialog(
             message: "Không có giá trị đơn vị khả dụng");
       }
@@ -255,14 +301,14 @@ class HomeProvider extends ChangeNotifier {
               unitOfMeasure: getMissingUnits().first,
             ),
             unitList: getSelectedUnits(),
-            itemCode: scanResult,
+            itemCode: scanLocation,
           ),
         ),
       );
       if (result.isNotEmpty) {
         await _fetchData(result, context);
-        scanResult = result;
-        textController.text = result;
+        scanLocation = result;
+        locationController.text = result;
         notifyListeners();
       }
     } else {
@@ -282,7 +328,7 @@ class HomeProvider extends ChangeNotifier {
               MaterialPageRoute(
                 builder: (context) => CreateItemScreen(
                   product: ProductModel(
-                    itemCode: scanResult,
+                    itemCode: scanLocation,
                     barCode: '',
                     unitOfMeasure: unitList.first,
                     length: 0,
@@ -293,14 +339,14 @@ class HomeProvider extends ChangeNotifier {
                     createDate: DateTime.now(),
                     images: [],
                   ),
-                  itemCode: scanResult,
+                  itemCode: scanLocation,
                 ),
               ),
             );
             if (result.isNotEmpty) {
               await _fetchData(result, context);
-              scanResult = result;
-              textController.text = result;
+              scanLocation = result;
+              locationController.text = result;
               notifyListeners();
             }
           }
@@ -313,14 +359,14 @@ class HomeProvider extends ChangeNotifier {
                   unitOfMeasure: getMissingUnits().first,
                 ),
                 unitList: getSelectedUnits(),
-                itemCode: scanResult,
+                itemCode: scanLocation,
               ),
             ),
           );
           if (result.isNotEmpty) {
             await _fetchData(result, context);
-            scanResult = result;
-            textController.text = result;
+            scanLocation = result;
+            productController.text = result;
             notifyListeners();
           }
         }

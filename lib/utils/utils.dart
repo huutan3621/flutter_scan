@@ -27,6 +27,15 @@ class Utils {
     }
   }
 
+  static String handleTSScanLocation(String result, BuildContext context) {
+    if (isValidLocation(result)) {
+      return result;
+    } else {
+      showErrorDialog("Vị trí không khả dụng");
+      return "";
+    }
+  }
+
   static void showErrorDialog(String message) {
     final context = navigatorKey.currentContext;
     if (context != null) {
@@ -56,5 +65,11 @@ class Utils {
   static String extractNumberFromText(String text) {
     final match = RegExp(r'^9\d{5}').firstMatch(text);
     return match?.group(0) ?? '';
+  }
+
+  static bool isValidLocation(String code) {
+    String pattern = r'^[a-zA-Z0-9]{3}-\d{4}$';
+    RegExp regExp = RegExp(pattern);
+    return regExp.hasMatch(code);
   }
 }

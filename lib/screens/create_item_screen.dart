@@ -83,7 +83,7 @@ class _CreateItemChildState extends State<CreateItemChild> {
                   padding: const EdgeInsets.all(8.0),
                   child: SingleChildScrollView(
                     child: Form(
-                      key: value.formKey, // Assign the global key to Form
+                      key: value.formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

@@ -57,7 +57,7 @@ class _HomeChildState extends State<HomeChild> {
               title: const Text('Danh sách'),
               actions: [
                 Visibility(
-                  visible: value.textController.text != "",
+                  visible: value.locationController.text != "",
                   child: IconButton(
                     icon: const Icon(Icons.refresh),
                     onPressed: _refreshData,
@@ -92,31 +92,43 @@ class _HomeChildState extends State<HomeChild> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Row(
+                    child: Column(
                       children: [
-                        Expanded(
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
                           child: TextFormField(
-                            controller: value.textController,
+                            controller: value.locationController,
                             keyboardType: TextInputType.none,
                             readOnly: true,
                             decoration: const InputDecoration(
-                              labelText: 'SKU',
-                              hintText: 'SKU',
+                              labelText: 'Vị trí',
+                              hintText: 'Vị trí',
                               border: OutlineInputBorder(),
                               suffixIcon: Icon(Icons.qr_code),
                             ),
                             onTap: () async {
-                              value.navigateToScanScreen(context);
+                              value.locationToScanScreen(context);
                             },
                           ),
                         ),
-                        // const SizedBox(width: 8),
-                        // CustomButton(
-                        //   onTap: () {
-                        //     value.navigateToCreateScreen(context);
-                        //   },
-                        //   title: 'Tạo mới',
-                        // ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: TextFormField(
+                            controller: value.productController,
+                            enabled: value.locationController != "",
+                            keyboardType: TextInputType.none,
+                            readOnly: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Mã sản phẩm',
+                              hintText: 'Mã sản phẩm',
+                              border: OutlineInputBorder(),
+                              suffixIcon: Icon(Icons.qr_code),
+                            ),
+                            onTap: () async {
+                              value.productToScanScreen(context);
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   ),
