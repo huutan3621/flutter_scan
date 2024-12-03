@@ -34,12 +34,12 @@ class ApiService {
   static String _getBaseUrl(Environment environment) {
     switch (environment) {
       case Environment.development:
-        return 'https://dev.scanproduct.trungsoncare.com/';
+        return 'https://dev.scanproduct.trungsoncare.com';
       case Environment.staging:
-        return 'https://staging.scanproduct.trungsoncare.com/';
+        return 'https://staging.scanproduct.trungsoncare.com';
       case Environment.production:
       default:
-        return 'https://scanproduct.trungsoncare.com/';
+        return 'https://scanproduct.trungsoncare.com';
     }
   }
 

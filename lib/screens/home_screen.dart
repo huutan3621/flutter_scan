@@ -95,7 +95,7 @@ class _HomeChildState extends State<HomeChild> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.only(bottom: 16),
                           child: TextFormField(
                             controller: value.locationController,
                             keyboardType: TextInputType.none,
@@ -112,10 +112,10 @@ class _HomeChildState extends State<HomeChild> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.only(bottom: 16),
                           child: TextFormField(
                             controller: value.productController,
-                            enabled: value.locationController != "",
+                            enabled: value.locationController.text != "",
                             keyboardType: TextInputType.none,
                             readOnly: true,
                             decoration: const InputDecoration(
