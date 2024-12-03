@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_scanner_app/model/warehouse_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_scanner_app/main.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
@@ -130,6 +131,67 @@ class ApiService {
         _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
         throw ApiException(
             'Failed to load products. Status code: ${response.statusCode}');
+      }
+    });
+  }
+
+  Future<bool> scanProductAddLocation(
+      String locationCode, String scanCode) async {
+    _logRequest(
+      '$baseUrl/api/v2/Warehouse/scan-product',
+      {
+        'locationCode': locationCode,
+        'scanCode': scanCode,
+        'createBy': "App Mobile",
+      },
+    );
+
+    final response = await dio.post(
+      '$baseUrl/api/v2/Warehouse/scan-product',
+      data: {
+        'locationCode': locationCode,
+        'scanCode': scanCode,
+        'createBy': "App Mobile",
+      },
+      options: Options(headers: {'Content-Type': 'application/json'}),
+    );
+
+    _logResponse(response);
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
+      return false;
+    }
+  }
+
+  Future<WarehouseResponse> fetchProducts({
+    required int pageNumber,
+    required int pageSize,
+    String? itemNumber,
+  }) async {
+    return _retry(() async {
+      final endpoint =
+          '$baseUrl/api/v2/Warehouse/products?pageNumber=$pageNumber&pageSize=$pageSize${itemNumber != null ? '&itemNumber=$itemNumber' : ''}';
+
+      _logRequest(endpoint, null);
+
+      final response = await dio.get(
+        endpoint,
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+
+      _logResponse(response);
+
+      if (response.statusCode == 200) {
+        // Deserialize response using WarehouseResponse
+        return WarehouseResponse.fromJson(response.data);
+      } else {
+        _handleErrorDialog(
+            "Có lỗi xảy ra. Mã lỗi: ${response.statusCode} - ${response.statusMessage}");
+        throw ApiException(
+            'Failed to fetch products. Status code: ${response.statusCode}');
       }
     });
   }

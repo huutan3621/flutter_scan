@@ -22,8 +22,10 @@ class Utils {
     } else if (isValidTextFormat(result)) {
       return result = extractNumberFromText(result);
     } else {
-      showErrorDialog("Barcode không khả dụng");
-      return "";
+      if (result == "-1") {
+        return "";
+      }
+      return result;
     }
   }
 

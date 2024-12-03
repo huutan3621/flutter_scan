@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/controller/create_item_provider.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
-import 'package:flutter_scanner_app/utils/permission.dart';
 import 'package:flutter_scanner_app/widgets/custom_button.dart';
 import 'package:flutter_scanner_app/widgets/custom_textform_field.dart';
 import 'package:flutter_scanner_app/widgets/custom_validate_dropdown.dart';
@@ -57,7 +56,11 @@ class _CreateItemChildState extends State<CreateItemChild> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       var homeProvider =
           Provider.of<CreateItemProvider>(context, listen: false);
-      homeProvider.init(widget.itemCode, widget.product, widget.unitList);
+      homeProvider.init(
+        widget.itemCode,
+        widget.product,
+        widget.unitList,
+      );
     });
     super.initState();
   }

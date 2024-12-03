@@ -55,8 +55,13 @@ class CreateItemProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> init(String? itemNumber, ProductModel? product,
-      List<String>? unitListData) async {
+  Future<void> init(
+    String? itemNumber,
+    ProductModel? product,
+    List<String>? unitListData,
+  ) async {
+    //location
+
     //get unit
     disableUnitList = unitListData ?? [];
     selectedLengthUnit = lengthUnit.last;

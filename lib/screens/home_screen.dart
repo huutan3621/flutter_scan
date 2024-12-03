@@ -1,9 +1,15 @@
+// import 'package:ai_barcode/ai_barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/controller/home_provider.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/widgets/custom_button.dart';
+import 'package:flutter_scanner_app/widgets/custom_qr_overlay.dart';
 import 'package:flutter_scanner_app/widgets/loading_overlay.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
+
+export 'package:simple_barcode_scanner/barcode_appbar.dart';
+export 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -48,6 +54,11 @@ class _HomeChildState extends State<HomeChild> {
 
   @override
   Widget build(BuildContext context) {
+    final scanWindow = Rect.fromCenter(
+      center: MediaQuery.of(context).size.center(Offset.zero),
+      width: 279,
+      height: 279,
+    );
     return Consumer<HomeProvider>(
       builder: (context, value, child) {
         return CustomLoadingOverlay(
@@ -129,11 +140,86 @@ class _HomeChildState extends State<HomeChild> {
                             },
                           ),
                         ),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 16),
+                          child: Text(
+                            "Quét mã sản phẩm",
+                            style: TextStyle(fontSize: 24),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Text(
+                            "Vị trí sản phẩm: ${value.locationData}",
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                        ),
+                        // SizedBox(
+                        //     width: MediaQuery.of(context).size.width,
+                        //     height: MediaQuery.of(context).size.width,
+                        //     child: PlatformAiBarcodeScannerWidget(
+                        //       platformScannerController:
+                        //           value.creatorController,
+                        //     )),
+                        // value.isCameraGranted
+                        //     ?
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.width,
+                          child: Stack(
+                            children: [
+                              MobileScanner(
+                                controller: value.qrController,
+                                fit: BoxFit.cover,
+                                onDetect: (capture) {
+                                  value.onDetect(capture, context);
+                                },
+                                scanWindow: scanWindow,
+                              ),
+                              Container(
+                                decoration: ShapeDecoration(
+                                  shape: CustomQrScannerOverlayShape(
+                                    borderColor:
+                                        const Color.fromARGB(255, 6, 4, 4),
+                                    borderWidth: 8.0,
+                                    overlayColor:
+                                        const Color.fromRGBO(0, 0, 0, 60),
+                                    borderRadius: 4,
+                                    borderLength: 40,
+                                    cutOutSize: 279,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                        // : SizedBox(
+                        //     width: MediaQuery.of(context).size.width,
+                        //     height: MediaQuery.of(context).size.width,
+                        //     child: Stack(
+                        //       children: [
+                        //         Container(
+                        //           decoration: ShapeDecoration(
+                        //             shape: CustomQrScannerOverlayShape(
+                        //               borderColor: const Color.fromARGB(
+                        //                   255, 6, 4, 4),
+                        //               borderWidth: 8.0,
+                        //               overlayColor:
+                        //                   const Color.fromRGBO(0, 0, 0, 60),
+                        //               borderRadius: 4,
+                        //               borderLength: 40,
+                        //               cutOutSize: 279,
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   )
                       ],
                     ),
                   ),
                   Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    margin: const EdgeInsets.all(16),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: DataTable(

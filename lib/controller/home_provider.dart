@@ -1,3 +1,4 @@
+// import 'package:ai_barcode/ai_barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/screens/create_item_screen.dart';
@@ -7,7 +8,9 @@ import 'package:flutter_scanner_app/utils/utils.dart';
 import 'package:flutter_scanner_app/widgets/custom_button.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 import 'package:flutter_scanner_app/widgets/image_review_dialog.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class HomeProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
@@ -21,8 +24,11 @@ class HomeProvider extends ChangeNotifier {
   late List<String> unitList = [];
   bool isLoading = false;
   bool _networkDialogShown = false;
+  String locationData = "";
 
-  Future<void> init(BuildContext context) async {}
+  Future<void> init(BuildContext context) async {
+    await checkPerms();
+  }
 
   void setLoading(bool value) {
     isLoading = value;
@@ -32,7 +38,7 @@ class HomeProvider extends ChangeNotifier {
   Future<void> onRefresh(BuildContext context) async {
     dataList.clear();
     unitList.clear();
-    await _fetchData(scanLocation, context);
+    await _fetchData(locationController.text, scanProduct, context);
   }
 
   Future<void> locationToScanScreen(BuildContext context) async {
@@ -40,6 +46,8 @@ class HomeProvider extends ChangeNotifier {
     debugPrint('Network connected: $isConnected');
 
     if (isConnected) {
+      locationData = "";
+      notifyListeners();
       var res = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -63,6 +71,7 @@ class HomeProvider extends ChangeNotifier {
 
     if (isConnected) {
       if (locationController.text != "") {
+        locationData = "";
         var res = await Navigator.push(
           context,
           MaterialPageRoute(
@@ -91,7 +100,7 @@ class HomeProvider extends ChangeNotifier {
     locationController.text = scanLocation;
     notifyListeners();
     if (scanLocation.isNotEmpty) {
-      await _fetchData(scanLocation, context);
+      // await _fetchData(scanLocation, context);
     } else {
       dataList.clear();
       unitList.clear();
@@ -101,11 +110,11 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<void> handleScanProduct(String result, BuildContext context) async {
-    scanLocation = Utils.handleTSScanResult(result, context);
-    productController.text = scanLocation;
+    scanProduct = Utils.handleTSScanResult(result, context);
+    productController.text = scanProduct;
     notifyListeners();
-    if (scanLocation.isNotEmpty) {
-      await _fetchData(scanLocation, context);
+    if (scanProduct.isNotEmpty) {
+      await _fetchData(scanLocation, scanProduct, context);
     } else {
       dataList.clear();
       unitList.clear();
@@ -114,22 +123,27 @@ class HomeProvider extends ChangeNotifier {
     await checkNavigateAfterScan(context);
   }
 
-  Future<void> _fetchData(String itemNumber, BuildContext context) async {
+  Future<void> _fetchData(
+      String locationCode, String scanCode, BuildContext context) async {
     if (await networkHelper.isConnected()) {
       _networkDialogShown = false;
-      setLoading(true);
+
       try {
         await Future.wait([
+          apiService.getProductsById(scanCode).then((data) => dataList = data),
+          apiService.getUnitById(scanCode).then((units) => unitList = units),
           apiService
-              .getProductsById(itemNumber)
-              .then((data) => dataList = data),
-          apiService.getUnitById(itemNumber).then((units) => unitList = units),
+              .fetchProducts(pageNumber: 1, pageSize: 10, itemNumber: scanCode)
+              .then((value) => locationData = value.data.first.locationCode),
         ]);
         notifyListeners();
       } catch (e) {
         // Handle exception if needed
       } finally {
-        setLoading(false);
+        if (locationData == "") {
+          await apiService.scanProductAddLocation(locationCode, scanCode);
+          handleScanProduct(scanCode, context);
+        }
       }
     } else if (!_networkDialogShown) {
       _networkDialogShown = true;
@@ -139,6 +153,7 @@ class HomeProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    productController.dispose();
     locationController.dispose();
     super.dispose();
   }
@@ -166,12 +181,19 @@ class HomeProvider extends ChangeNotifier {
     debugPrint('Network connected: $isConnected');
 
     if (isConnected) {
-      scanLocation = "";
-      locationController.clear();
-      dataList.clear();
-      unitList.clear();
-      notifyListeners();
-      await navigateToCreateScreen(context);
+      if (locationController.text != "") {
+        scanProduct = "";
+        productController.clear();
+        locationData = "";
+        dataList.clear();
+        unitList.clear();
+        notifyListeners();
+        await navigateToCreateScreen(context);
+      } else {
+        DialogHelper.showErrorDialog(
+          message: "Không có dữ liệu vị trí, vui lòng thử lại",
+        );
+      }
     } else {
       debugPrint('No network connection. Showing error dialog.');
       DialogHelper.showErrorDialog(
@@ -184,7 +206,7 @@ class HomeProvider extends ChangeNotifier {
     bool isConnected = await networkHelper.isConnected();
     debugPrint('Network connected: $isConnected');
 
-    if (scanLocation.isNotEmpty) {
+    if (scanProduct.isNotEmpty) {
       if (isConnected) {
         if (dataList.isNotEmpty) {
           await checkNavigate(context);
@@ -193,9 +215,9 @@ class HomeProvider extends ChangeNotifier {
             context,
             MaterialPageRoute(
               builder: (context) => CreateItemScreen(
-                itemCode: scanLocation,
+                itemCode: scanProduct,
                 product: ProductModel(
-                  itemCode: scanLocation,
+                  itemCode: scanProduct,
                   barCode: '',
                   unitOfMeasure: unitList.first,
                   length: 0,
@@ -210,9 +232,9 @@ class HomeProvider extends ChangeNotifier {
             ),
           );
           if (result.isNotEmpty) {
-            await _fetchData(result, context);
-            scanLocation = result;
-            locationController.text = result;
+            await _fetchData(locationController.text, result, context);
+            scanProduct = result;
+            productController.text = result;
             notifyListeners();
           }
         }
@@ -223,6 +245,10 @@ class HomeProvider extends ChangeNotifier {
               "Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
         );
       }
+    } else if (locationController.text == "") {
+      DialogHelper.showErrorDialog(
+        message: "Không có dữ liệu vị trí, vui lòng thử lại",
+      );
     } else {
       DialogHelper.showErrorDialog(
         message: "Không có SKU để cập nhật",
@@ -245,9 +271,9 @@ class HomeProvider extends ChangeNotifier {
           ),
         );
         if (result.isNotEmpty) {
-          await _fetchData(result, context);
-          scanLocation = result;
-          locationController.text = result;
+          await _fetchData(locationController.text, result, context);
+          scanProduct = result;
+          productController.text = result;
           notifyListeners();
         }
       }
@@ -267,7 +293,7 @@ class HomeProvider extends ChangeNotifier {
           MaterialPageRoute(
             builder: (context) => CreateItemScreen(
               product: ProductModel(
-                itemCode: scanLocation,
+                itemCode: scanProduct,
                 barCode: '',
                 unitOfMeasure: unitList.first,
                 length: 0,
@@ -278,17 +304,17 @@ class HomeProvider extends ChangeNotifier {
                 createDate: DateTime.now(),
                 images: [],
               ),
-              itemCode: scanLocation,
+              itemCode: scanProduct,
             ),
           ),
         );
         if (result.isNotEmpty) {
-          await _fetchData(result, context);
-          scanLocation = result;
-          locationController.text = result;
+          await _fetchData(locationController.text, result, context);
+          scanProduct = result;
+          productController.text = result;
           notifyListeners();
         }
-      } else if (scanLocation.isNotEmpty) {
+      } else if (scanProduct.isNotEmpty) {
         DialogHelper.showErrorDialog(
             message: "Không có giá trị đơn vị khả dụng");
       }
@@ -301,14 +327,14 @@ class HomeProvider extends ChangeNotifier {
               unitOfMeasure: getMissingUnits().first,
             ),
             unitList: getSelectedUnits(),
-            itemCode: scanLocation,
+            itemCode: scanProduct,
           ),
         ),
       );
       if (result.isNotEmpty) {
-        await _fetchData(result, context);
-        scanLocation = result;
-        locationController.text = result;
+        await _fetchData(locationController.text, result, context);
+        scanProduct = result;
+        productController.text = result;
         notifyListeners();
       }
     } else {
@@ -321,14 +347,14 @@ class HomeProvider extends ChangeNotifier {
       // Thay thế
       setLoading(true);
       try {
-        if (dataList.isEmpty) {
+        if (dataList.isEmpty && locationController.text == locationData) {
           if (unitList.isNotEmpty) {
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => CreateItemScreen(
                   product: ProductModel(
-                    itemCode: scanLocation,
+                    itemCode: scanProduct,
                     barCode: '',
                     unitOfMeasure: unitList.first,
                     length: 0,
@@ -339,18 +365,19 @@ class HomeProvider extends ChangeNotifier {
                     createDate: DateTime.now(),
                     images: [],
                   ),
-                  itemCode: scanLocation,
+                  itemCode: scanProduct,
                 ),
               ),
             );
             if (result.isNotEmpty) {
-              await _fetchData(result, context);
-              scanLocation = result;
-              locationController.text = result;
+              await _fetchData(locationController.text, result, context);
+              scanProduct = result;
+              productController.text = result;
               notifyListeners();
             }
           }
-        } else if (!containsAllUnits()) {
+        } else if (!containsAllUnits() &&
+            locationController.text == locationData) {
           final result = await Navigator.push(
             context,
             MaterialPageRoute(
@@ -359,13 +386,13 @@ class HomeProvider extends ChangeNotifier {
                   unitOfMeasure: getMissingUnits().first,
                 ),
                 unitList: getSelectedUnits(),
-                itemCode: scanLocation,
+                itemCode: scanProduct,
               ),
             ),
           );
           if (result.isNotEmpty) {
-            await _fetchData(result, context);
-            scanLocation = result;
+            await _fetchData(locationController.text, result, context);
+            scanProduct = result;
             productController.text = result;
             notifyListeners();
           }
@@ -435,5 +462,63 @@ class HomeProvider extends ChangeNotifier {
       _networkDialogShown = true;
       DialogHelper.showErrorDialog(message: "Không có kết nối mạng");
     }
+  }
+
+  final MobileScannerController qrController = MobileScannerController(
+      detectionSpeed: DetectionSpeed.normal,
+      facing: CameraFacing.back,
+      formats: [BarcodeFormat.all]);
+
+  // final ScannerController creatorController = ScannerController(
+  //   scannerResult: (value) {},
+  // );
+
+  String scannedDataQr = '';
+  bool _isCameraGranted = false;
+
+  bool get isCameraGranted => _isCameraGranted;
+
+  Future<void> checkPerms() async {
+    PermissionStatus status = await Permission.camera.request();
+
+    if (status.isGranted) {
+      _isCameraGranted = true;
+      qrController.start();
+    } else if (status.isDenied) {
+      status = await Permission.camera.request();
+    } else if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+
+    _isCameraGranted = status.isGranted;
+    if (_isCameraGranted) {
+      qrController.start();
+      // creatorController.startCameraPreview();
+    }
+    notifyListeners();
+  }
+
+  String onDetect(
+    BarcodeCapture capture,
+    BuildContext context,
+  ) {
+    print("scandata: $scanProduct");
+    if (capture.barcodes.isNotEmpty &&
+        scannedDataQr != capture.barcodes.first.rawValue) {
+      scannedDataQr = capture.barcodes.first.rawValue ?? '';
+      scanProduct = Utils.handleTSScanResult(scannedDataQr, context);
+      productController.text = scanProduct;
+      print("scandata: $scanProduct");
+      notifyListeners();
+      if (scanProduct.isNotEmpty) {
+        // _fetchData(scanLocation, scanProduct, context);
+      } else {
+        dataList.clear();
+        unitList.clear();
+        notifyListeners();
+      }
+      checkNavigateAfterScan(context);
+    }
+    return scannedDataQr;
   }
 }
