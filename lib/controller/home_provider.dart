@@ -8,9 +8,7 @@ import 'package:flutter_scanner_app/utils/utils.dart';
 import 'package:flutter_scanner_app/widgets/custom_button.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 import 'package:flutter_scanner_app/widgets/image_review_dialog.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 
 class HomeProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
@@ -26,9 +24,7 @@ class HomeProvider extends ChangeNotifier {
   bool _networkDialogShown = false;
   String locationData = "";
 
-  Future<void> init(BuildContext context) async {
-    await checkPerms();
-  }
+  Future<void> init(BuildContext context) async {}
 
   void setLoading(bool value) {
     isLoading = value;
@@ -120,7 +116,7 @@ class HomeProvider extends ChangeNotifier {
       unitList.clear();
       notifyListeners();
     }
-    await checkNavigateAfterScan(context);
+    // await checkNavigateAfterScan(context);
   }
 
   Future<void> _fetchData(
@@ -134,20 +130,27 @@ class HomeProvider extends ChangeNotifier {
           apiService.getUnitById(scanCode).then((units) => unitList = units),
           apiService
               .fetchProducts(pageNumber: 1, pageSize: 10, itemNumber: scanCode)
-              .then((value) => locationData = value.data.first.locationCode),
+              .then((value) =>
+                  locationData = value.data?.first.locationCode ?? ""),
         ]);
         notifyListeners();
       } catch (e) {
         // Handle exception if needed
-      } finally {
-        if (locationData == "") {
-          await apiService.scanProductAddLocation(locationCode, scanCode);
-          handleScanProduct(scanCode, context);
-        }
-      }
+      } finally {}
     } else if (!_networkDialogShown) {
       _networkDialogShown = true;
       DialogHelper.showErrorDialog(message: "Không có kết nối mạng");
+    }
+  }
+
+  Future<void> updateLocation(BuildContext context) async {
+    if (locationData == "") {
+      final result =
+          await apiService.scanProductAddLocation(scanLocation, scanProduct);
+      if (result) {
+        DialogHelper.showSuccessDialog(message: "Thêm vị trí thành công");
+      }
+      await _fetchData(scanLocation, scanProduct, context);
     }
   }
 
@@ -462,63 +465,5 @@ class HomeProvider extends ChangeNotifier {
       _networkDialogShown = true;
       DialogHelper.showErrorDialog(message: "Không có kết nối mạng");
     }
-  }
-
-  final MobileScannerController qrController = MobileScannerController(
-      detectionSpeed: DetectionSpeed.normal,
-      facing: CameraFacing.back,
-      formats: [BarcodeFormat.all]);
-
-  // final ScannerController creatorController = ScannerController(
-  //   scannerResult: (value) {},
-  // );
-
-  String scannedDataQr = '';
-  bool _isCameraGranted = false;
-
-  bool get isCameraGranted => _isCameraGranted;
-
-  Future<void> checkPerms() async {
-    PermissionStatus status = await Permission.camera.request();
-
-    if (status.isGranted) {
-      _isCameraGranted = true;
-      qrController.start();
-    } else if (status.isDenied) {
-      status = await Permission.camera.request();
-    } else if (status.isPermanentlyDenied) {
-      openAppSettings();
-    }
-
-    _isCameraGranted = status.isGranted;
-    if (_isCameraGranted) {
-      qrController.start();
-      // creatorController.startCameraPreview();
-    }
-    notifyListeners();
-  }
-
-  String onDetect(
-    BarcodeCapture capture,
-    BuildContext context,
-  ) {
-    print("scandata: $scanProduct");
-    if (capture.barcodes.isNotEmpty &&
-        scannedDataQr != capture.barcodes.first.rawValue) {
-      scannedDataQr = capture.barcodes.first.rawValue ?? '';
-      scanProduct = Utils.handleTSScanResult(scannedDataQr, context);
-      productController.text = scanProduct;
-      print("scandata: $scanProduct");
-      notifyListeners();
-      if (scanProduct.isNotEmpty) {
-        // _fetchData(scanLocation, scanProduct, context);
-      } else {
-        dataList.clear();
-        unitList.clear();
-        notifyListeners();
-      }
-      checkNavigateAfterScan(context);
-    }
-    return scannedDataQr;
   }
 }

@@ -4,14 +4,14 @@ part 'location_model.g.dart';
 
 @JsonSerializable()
 class LocationModel {
-  final String locationCode;
-  final String scanCode;
-  final String createBy;
+  final String? locationCode;
+  final String? scanCode;
+  final String? createBy;
 
   LocationModel({
-    required this.locationCode,
-    required this.scanCode,
-    required this.createBy,
+    this.locationCode,
+    this.scanCode,
+    this.createBy,
   });
 
   // A factory constructor for creating an instance from JSON

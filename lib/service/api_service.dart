@@ -99,7 +99,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final responseData = ResponseModel.fromJson(response.data);
-        return responseData.products;
+        return responseData.products ?? [];
       } else {
         _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
         throw ApiException(
@@ -161,7 +161,7 @@ class ApiService {
     if (response.statusCode == 200) {
       return true;
     } else {
-      _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
+      _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.statusCode}");
       return false;
     }
   }

@@ -8,12 +8,12 @@ part of 'product_model.dart';
 
 ResponseModel _$ResponseModelFromJson(Map<String, dynamic> json) =>
     ResponseModel(
-      totalCount: (json['totalCount'] as num).toInt(),
-      pageSize: (json['pageSize'] as num).toInt(),
-      currentPage: (json['currentPage'] as num).toInt(),
-      totalPages: (json['totalPages'] as num).toInt(),
-      products: (json['products'] as List<dynamic>)
-          .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
+      totalCount: (json['totalCount'] as num?)?.toInt(),
+      pageSize: (json['pageSize'] as num?)?.toInt(),
+      currentPage: (json['currentPage'] as num?)?.toInt(),
+      totalPages: (json['totalPages'] as num?)?.toInt(),
+      products: (json['products'] as List<dynamic>?)
+          ?.map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

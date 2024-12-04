@@ -3,12 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/controller/home_provider.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/widgets/custom_button.dart';
-import 'package:flutter_scanner_app/widgets/custom_qr_overlay.dart';
 import 'package:flutter_scanner_app/widgets/loading_overlay.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 
-export 'package:simple_barcode_scanner/barcode_appbar.dart';
 export 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -77,10 +74,24 @@ class _HomeChildState extends State<HomeChild> {
               ],
             ),
             bottomNavigationBar: BottomAppBar(
-              height: MediaQuery.of(context).size.height / 5.5,
+              height: value.scanProduct != "" && value.locationData == ""
+                  ? MediaQuery.of(context).size.height / 4.3
+                  : MediaQuery.of(context).size.height / 5.5,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
                 children: [
+                  Visibility(
+                    visible:
+                        value.scanProduct != "" && value.locationData == "",
+                    child: CustomButton(
+                      onTap: () async {
+                        value.updateLocation(context);
+                      },
+                      title: 'Thêm vị trí',
+                      btnColor: Colors.purple[300],
+                    ),
+                  ),
                   CustomButton(
                     onTap: () async {
                       value.updateTable(context);
@@ -140,13 +151,6 @@ class _HomeChildState extends State<HomeChild> {
                             },
                           ),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 16),
-                          child: Text(
-                            "Quét mã sản phẩm",
-                            style: TextStyle(fontSize: 24),
-                          ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: Text(
@@ -163,36 +167,36 @@ class _HomeChildState extends State<HomeChild> {
                         //     )),
                         // value.isCameraGranted
                         //     ?
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.width,
-                          child: Stack(
-                            children: [
-                              MobileScanner(
-                                controller: value.qrController,
-                                fit: BoxFit.cover,
-                                onDetect: (capture) {
-                                  value.onDetect(capture, context);
-                                },
-                                scanWindow: scanWindow,
-                              ),
-                              Container(
-                                decoration: ShapeDecoration(
-                                  shape: CustomQrScannerOverlayShape(
-                                    borderColor:
-                                        const Color.fromARGB(255, 6, 4, 4),
-                                    borderWidth: 8.0,
-                                    overlayColor:
-                                        const Color.fromRGBO(0, 0, 0, 60),
-                                    borderRadius: 4,
-                                    borderLength: 40,
-                                    cutOutSize: 279,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
+                        // SizedBox(
+                        //   width: MediaQuery.of(context).size.width,
+                        //   height: MediaQuery.of(context).size.width,
+                        //   child: Stack(
+                        //     children: [
+                        //       MobileScanner(
+                        //         controller: value.qrController,
+                        //         fit: BoxFit.cover,
+                        //         onDetect: (capture) {
+                        //           value.onDetect(capture, context);
+                        //         },
+                        //         scanWindow: scanWindow,
+                        //       ),
+                        //       Container(
+                        //         decoration: ShapeDecoration(
+                        //           shape: CustomQrScannerOverlayShape(
+                        //             borderColor:
+                        //                 const Color.fromARGB(255, 6, 4, 4),
+                        //             borderWidth: 8.0,
+                        //             overlayColor:
+                        //                 const Color.fromRGBO(0, 0, 0, 60),
+                        //             borderRadius: 4,
+                        //             borderLength: 40,
+                        //             cutOutSize: 279,
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // )
                         // : SizedBox(
                         //     width: MediaQuery.of(context).size.width,
                         //     height: MediaQuery.of(context).size.width,

@@ -5,22 +5,22 @@ part 'product_model.g.dart';
 @JsonSerializable()
 class ResponseModel {
   @JsonKey(name: "totalCount")
-  final int totalCount;
+  final int? totalCount;
   @JsonKey(name: "pageSize")
-  final int pageSize;
+  final int? pageSize;
   @JsonKey(name: "currentPage")
-  final int currentPage;
+  final int? currentPage;
   @JsonKey(name: "totalPages")
-  final int totalPages;
+  final int? totalPages;
   @JsonKey(name: "products")
-  final List<ProductModel> products;
+  final List<ProductModel>? products;
 
   ResponseModel({
-    required this.totalCount,
-    required this.pageSize,
-    required this.currentPage,
-    required this.totalPages,
-    required this.products,
+    this.totalCount,
+    this.pageSize,
+    this.currentPage,
+    this.totalPages,
+    this.products,
   });
 
   ResponseModel copyWith({

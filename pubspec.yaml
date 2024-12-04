@@ -47,8 +47,7 @@ dependencies:
   permission_handler: ^11.3.1
   path_provider: ^2.1.4
   path: ^1.9.0
-  mobile_scanner: ^6.0.2
-  # ai_barcode: ^3.2.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -4,18 +4,18 @@ part 'warehouse_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class WarehouseResponse {
-  final int totalCount;
-  final int pageSize;
-  final int currentPage;
-  final int totalPages;
-  final List<LocationData> data;
+  final int? totalCount;
+  final int? pageSize;
+  final int? currentPage;
+  final int? totalPages;
+  final List<LocationData>? data;
 
   WarehouseResponse({
-    required this.totalCount,
-    required this.pageSize,
-    required this.currentPage,
-    required this.totalPages,
-    required this.data,
+    this.totalCount,
+    this.pageSize,
+    this.currentPage,
+    this.totalPages,
+    this.data,
   });
 
   factory WarehouseResponse.fromJson(Map<String, dynamic> json) =>
@@ -26,12 +26,12 @@ class WarehouseResponse {
 
 @JsonSerializable(explicitToJson: true)
 class LocationData {
-  final String locationCode;
-  final List<Product> products;
+  final String? locationCode;
+  final List<Product>? products;
 
   LocationData({
-    required this.locationCode,
-    required this.products,
+    this.locationCode,
+    this.products,
   });
 
   factory LocationData.fromJson(Map<String, dynamic> json) =>
@@ -42,13 +42,13 @@ class LocationData {
 
 @JsonSerializable()
 class Product {
-  final String itemCode;
-  final String barCode;
+  final String? itemCode;
+  final String? barCode;
   final String? createBy;
 
   Product({
-    required this.itemCode,
-    required this.barCode,
+    this.itemCode,
+    this.barCode,
     this.createBy,
   });
 
