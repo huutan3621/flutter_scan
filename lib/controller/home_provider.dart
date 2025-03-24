@@ -185,15 +185,15 @@ class HomeProvider extends ChangeNotifier {
     debugPrint('Network connected: $isConnected');
 
     if (isConnected) {
-      if (locationController.text != "") {
-        scanProduct = "";
-        productController.clear();
-        locationData = "";
-        dataList.clear();
-        unitList.clear();
-        notifyListeners();
-        await navigateToCreateScreen(context);
-      }
+      // if (locationController.text != "") {
+      scanProduct = "";
+      productController.clear();
+      locationData = "";
+      dataList.clear();
+      unitList.clear();
+      notifyListeners();
+      await navigateToCreateScreen(context);
+      // }
       // else {
       //   DialogHelper.showErrorDialog(
       //     message: "Không có dữ liệu vị trí, vui lòng thử lại",
