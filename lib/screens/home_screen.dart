@@ -81,17 +81,17 @@ class _HomeChildState extends State<HomeChild> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Visibility(
-                    visible:
-                        value.scanProduct != "" && value.locationData == "",
-                    child: CustomButton(
-                      onTap: () async {
-                        value.updateLocation(context);
-                      },
-                      title: 'Thêm vị trí',
-                      btnColor: Colors.purple[300],
-                    ),
-                  ),
+                  // Visibility(
+                  //   visible:
+                  //       value.scanProduct != "" && value.locationData == "",
+                  //   child: CustomButton(
+                  //     onTap: () async {
+                  //       value.updateLocation(context);
+                  //     },
+                  //     title: 'Thêm vị trí',
+                  //     btnColor: Colors.purple[300],
+                  //   ),
+                  // ),
                   CustomButton(
                     onTap: () async {
                       value.updateTable(context);
@@ -116,28 +116,28 @@ class _HomeChildState extends State<HomeChild> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: TextFormField(
-                            controller: value.locationController,
-                            keyboardType: TextInputType.none,
-                            readOnly: true,
-                            decoration: const InputDecoration(
-                              labelText: 'Vị trí',
-                              hintText: 'Vị trí',
-                              border: OutlineInputBorder(),
-                              suffixIcon: Icon(Icons.qr_code),
-                            ),
-                            onTap: () async {
-                              value.locationToScanScreen(context);
-                            },
-                          ),
-                        ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(bottom: 16),
+                        //   child: TextFormField(
+                        //     controller: value.locationController,
+                        //     keyboardType: TextInputType.none,
+                        //     readOnly: true,
+                        //     decoration: const InputDecoration(
+                        //       labelText: 'Vị trí',
+                        //       hintText: 'Vị trí',
+                        //       border: OutlineInputBorder(),
+                        //       suffixIcon: Icon(Icons.qr_code),
+                        //     ),
+                        //     onTap: () async {
+                        //       value.locationToScanScreen(context);
+                        //     },
+                        //   ),
+                        // ),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: TextFormField(
                             controller: value.productController,
-                            enabled: value.locationController.text != "",
+                            // enabled: value.locationController.text != "",
                             keyboardType: TextInputType.none,
                             readOnly: true,
                             decoration: const InputDecoration(
@@ -151,13 +151,13 @@ class _HomeChildState extends State<HomeChild> {
                             },
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Text(
-                            "Vị trí sản phẩm: ${value.locationData}",
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                        ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(bottom: 16),
+                        //   child: Text(
+                        //     "Vị trí sản phẩm: ${value.locationData}",
+                        //     style: const TextStyle(fontSize: 24),
+                        //   ),
+                        // ),
                         // SizedBox(
                         //     width: MediaQuery.of(context).size.width,
                         //     height: MediaQuery.of(context).size.width,

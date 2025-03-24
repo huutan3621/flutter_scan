@@ -66,23 +66,24 @@ class HomeProvider extends ChangeNotifier {
     debugPrint('Network connected: $isConnected');
 
     if (isConnected) {
-      if (locationController.text != "") {
-        locationData = "";
-        var res = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SimpleBarcodeScannerPage(),
-          ),
-        );
-        if (res is String) {
-          handleScanProduct(res, context);
-        }
-      } else {
-        debugPrint('No location data.');
-        DialogHelper.showErrorDialog(
-          message: "Không có dữ liệu vị trí, vui lòng thử lại.",
-        );
+      // if (locationController.text != "") {
+      locationData = "";
+      var res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SimpleBarcodeScannerPage(),
+        ),
+      );
+      if (res is String) {
+        handleScanProduct(res, context);
       }
+      // }
+      //  else {
+      //   debugPrint('No location data.');
+      //   DialogHelper.showErrorDialog(
+      //     message: "Không có dữ liệu vị trí, vui lòng thử lại.",
+      //   );
+      // }
     } else {
       debugPrint('No network connection. Showing error dialog.');
       DialogHelper.showErrorDialog(
@@ -192,11 +193,12 @@ class HomeProvider extends ChangeNotifier {
         unitList.clear();
         notifyListeners();
         await navigateToCreateScreen(context);
-      } else {
-        DialogHelper.showErrorDialog(
-          message: "Không có dữ liệu vị trí, vui lòng thử lại",
-        );
       }
+      // else {
+      //   DialogHelper.showErrorDialog(
+      //     message: "Không có dữ liệu vị trí, vui lòng thử lại",
+      //   );
+      // }
     } else {
       debugPrint('No network connection. Showing error dialog.');
       DialogHelper.showErrorDialog(
@@ -248,11 +250,13 @@ class HomeProvider extends ChangeNotifier {
               "Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
         );
       }
-    } else if (locationController.text == "") {
-      DialogHelper.showErrorDialog(
-        message: "Không có dữ liệu vị trí, vui lòng thử lại",
-      );
-    } else {
+    }
+    // else if (locationController.text == "") {
+    //   DialogHelper.showErrorDialog(
+    //     message: "Không có dữ liệu vị trí, vui lòng thử lại",
+    //   );
+    // }
+    else {
       DialogHelper.showErrorDialog(
         message: "Không có SKU để cập nhật",
       );
