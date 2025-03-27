@@ -136,13 +136,13 @@ class ApiService {
   }
 
   Future<bool> scanProductAddLocation(
-      String locationCode, String scanCode) async {
+      String locationCode, String scanCode, String scanBy) async {
     _logRequest(
       '$baseUrl/api/v2/Warehouse/scan-product',
       {
         'locationCode': locationCode,
         'scanCode': scanCode,
-        'createBy': "App Mobile",
+        'createBy': scanBy,
       },
     );
 
@@ -151,7 +151,7 @@ class ApiService {
       data: {
         'locationCode': locationCode,
         'scanCode': scanCode,
-        'createBy': "App Mobile",
+        'createBy': scanBy,
       },
       options: Options(headers: {'Content-Type': 'application/json'}),
     );

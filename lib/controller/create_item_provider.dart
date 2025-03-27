@@ -4,6 +4,7 @@ import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/service/api_service.dart';
 import 'package:flutter_scanner_app/utils/network_helper.dart';
 import 'package:flutter_scanner_app/utils/permission.dart';
+import 'package:flutter_scanner_app/utils/sp_key.dart';
 import 'package:flutter_scanner_app/utils/unit_utils.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_scanner_app/widgets/image_review_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -419,13 +421,13 @@ class CreateItemProvider extends ChangeNotifier {
   }
 
   Future<void> chooseImageFromCamera(BuildContext context) async {
-    if (images.length >= 5) {
-      showErrorDialog(
-        context,
-        'Chỉ cho phép tối đa 5 ảnh',
-      );
-      return;
-    }
+    // if (images.length >= 5) {
+    //   showErrorDialog(
+    //     context,
+    //     'Chỉ cho phép tối đa 5 ảnh',
+    //   );
+    //   return;
+    // }
 
     final pickedFile = await picker.pickImage(
       source: ImageSource.camera,
@@ -519,6 +521,10 @@ class CreateItemProvider extends ChangeNotifier {
               selectedLengthUnit, WeightUnitEnum.mg.name))
           : 0;
 
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      final userName = prefs.getString(AppSPKey.userName);
+
       final body = ProductModel(
         itemCode: itemCodeController.text,
         barCode: barCodeController.text,
@@ -528,7 +534,7 @@ class CreateItemProvider extends ChangeNotifier {
         height: height,
         weight: weight,
         createDate: DateTime.now(),
-        createBy: "App Mobile",
+        createBy: userName ?? "App Mobile",
       );
 
       final response = await apiService.createItem(body);

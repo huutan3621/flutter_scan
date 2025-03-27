@@ -4,10 +4,12 @@ import 'package:flutter_scanner_app/model/product_model.dart';
 import 'package:flutter_scanner_app/screens/create_item_screen.dart';
 import 'package:flutter_scanner_app/service/api_service.dart';
 import 'package:flutter_scanner_app/utils/network_helper.dart';
+import 'package:flutter_scanner_app/utils/sp_key.dart';
 import 'package:flutter_scanner_app/utils/utils.dart';
 import 'package:flutter_scanner_app/widgets/custom_button.dart';
 import 'package:flutter_scanner_app/widgets/dialog_helper.dart';
 import 'package:flutter_scanner_app/widgets/image_review_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class HomeProvider extends ChangeNotifier {
@@ -15,8 +17,11 @@ class HomeProvider extends ChangeNotifier {
   final NetworkHelper networkHelper = NetworkHelper();
   late String scanLocation = '';
   late String scanProduct = '';
+  late String? userName = '';
+
   final TextEditingController locationController = TextEditingController();
   final TextEditingController productController = TextEditingController();
+  final TextEditingController userNameController = TextEditingController();
 
   late List<ProductModel> dataList = [];
   late List<String> unitList = [];
@@ -24,7 +29,13 @@ class HomeProvider extends ChangeNotifier {
   bool _networkDialogShown = false;
   String locationData = "";
 
-  Future<void> init(BuildContext context) async {}
+  Future<void> init(BuildContext context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    userName = prefs.getString(AppSPKey.userName);
+
+    notifyListeners();
+  }
 
   void setLoading(bool value) {
     isLoading = value;
@@ -59,6 +70,28 @@ class HomeProvider extends ChangeNotifier {
         message: "Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
       );
     }
+  }
+
+  Future<void> updateUserName() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final userInput = userNameController.text.trim();
+
+    final bool isValid = RegExp(r'^NS\d+$').hasMatch(userInput);
+
+    if (!isValid) {
+      DialogHelper.showErrorDialog(
+        message: "Mã nhân sự không hợp lệ, vui lòng thử lại",
+      );
+      return;
+    }
+
+    final isDone = await prefs.setString(AppSPKey.userName, userInput);
+
+    if (isDone) {
+      userName = userInput;
+    }
+    notifyListeners();
   }
 
   Future<void> productToScanScreen(BuildContext context) async {
@@ -146,8 +179,8 @@ class HomeProvider extends ChangeNotifier {
 
   Future<void> updateLocation(BuildContext context) async {
     if (locationData == "") {
-      final result =
-          await apiService.scanProductAddLocation(scanLocation, scanProduct);
+      final result = await apiService.scanProductAddLocation(
+          scanLocation, scanProduct, userName ?? "App Mobile");
       if (result) {
         DialogHelper.showSuccessDialog(message: "Thêm vị trí thành công");
       }
