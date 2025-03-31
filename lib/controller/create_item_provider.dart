@@ -579,7 +579,6 @@ class CreateItemProvider extends ChangeNotifier {
 
       FormData formData = FormData.fromMap({
         "ItemCode": itemCodeController.text,
-        "BarCode": itemCodeController.text,
         "UnitOfMeasure": selectedProductUnit,
         "Length": length.toString(),
         "Width": width.toString(),
