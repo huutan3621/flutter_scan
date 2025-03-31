@@ -105,21 +105,29 @@ class _CreateItemChildState extends State<CreateItemChild> {
                               return null;
                             },
                           ),
+                          // TextFormField(
+                          //   controller: value.barCodeController,
+                          //   enabled: value.isBarcodeEnable,
+                          //   readOnly: true,
+                          //   decoration:
+                          //       const InputDecoration(labelText: 'Barcode'),
+                          //   onTap: () {
+                          //     value.scanBarCode(context);
+                          //   },
+                          //   validator: (value) {
+                          //     if (value == null || value.isEmpty) {
+                          //       return 'Trường này bắt buộc nhập';
+                          //     }
+                          //     return null;
+                          //   },
+                          // ),
+
                           TextFormField(
-                            controller: value.barCodeController,
-                            enabled: value.isBarcodeEnable,
                             readOnly: true,
-                            decoration:
-                                const InputDecoration(labelText: 'Barcode'),
-                            onTap: () {
-                              value.scanBarCode(context);
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Trường này bắt buộc nhập';
-                              }
-                              return null;
-                            },
+                            controller: TextEditingController(
+                                text: widget.product?.itemName ?? ""),
+                            decoration: const InputDecoration(
+                                labelText: 'Tên sản phẩm'),
                           ),
                           CustomValidateDropDown(
                             label: "Đơn vị",

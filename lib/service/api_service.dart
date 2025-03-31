@@ -123,10 +123,17 @@ class ApiService {
       _logResponse(response);
 
       if (response.statusCode == 200) {
-        final List<dynamic> jsonList = response.data;
-        return jsonList
-            .map((jsonItem) => ProductModel.fromJson(jsonItem))
-            .toList();
+        final responseData = response.data;
+        if (responseData is Map<String, dynamic> &&
+            responseData.containsKey('result') &&
+            responseData['result'] is List<dynamic>) {
+          final List<dynamic> jsonList = responseData['result'];
+          return jsonList
+              .map((jsonItem) => ProductModel.fromJson(jsonItem))
+              .toList();
+        } else {
+          throw ApiException('Invalid response format');
+        }
       } else {
         _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
         throw ApiException(
@@ -210,8 +217,12 @@ class ApiService {
       _logResponse(response);
 
       if (response.statusCode == 200) {
-        final List<dynamic> jsonResult = response.data;
+        final responseData = response.data;
+        final List<dynamic> jsonResult = responseData['result'];
+
         return jsonResult.map((item) => item.toString()).toList();
+
+        // return jsonResult.map((item) => item.toString()).toList();
       } else {
         _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.data}");
         throw ApiException(
@@ -240,6 +251,21 @@ class ApiService {
             'Failed to create item. Status code: ${response.statusCode}');
       }
     });
+  }
+
+  Future<Response?> postFormData(FormData formData) async {
+    final response = await dio.post(
+      '$baseUrl/api/ScanProduct/create-scan-product-data',
+      data: formData,
+      options: Options(headers: {'Content-Type': 'multipart/form-data'}),
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.statusCode}");
+      return null;
+    }
   }
 
   Future<bool> updateProductImage(int productId, List<XFile> images) async {

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_scanner_app/utils/enum.dart';
 import 'package:flutter_scanner_app/model/product_model.dart';
@@ -32,11 +33,12 @@ class CreateItemProvider extends ChangeNotifier {
 
   // Controllers
   final TextEditingController itemCodeController = TextEditingController();
-  final TextEditingController barCodeController = TextEditingController();
+  // final TextEditingController barCodeController = TextEditingController();
   final TextEditingController lengthController = TextEditingController();
   final TextEditingController widthController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
+  final TextEditingController itemNameController = TextEditingController();
 
   // Selected unit
   String selectedLengthUnit = "";
@@ -75,10 +77,10 @@ class CreateItemProvider extends ChangeNotifier {
     //check product cases
     if (product != null) {
       itemCodeController.text = product.itemCode;
-      if (product.barCode != "") {
-        barCodeController.text = product.barCode;
-        isBarcodeEnable = false;
-      }
+      // if (product.barCode != "") {
+      //   barCodeController.text = product.barCode;
+      //   isBarcodeEnable = false;
+      // }
       // selectedProductUnit = product.unitOfMeasure;
       selectedLengthUnit = lengthUnit.last;
       selectedWeightUnit = weightUnit.last;
@@ -131,9 +133,10 @@ class CreateItemProvider extends ChangeNotifier {
         return;
       }
 
-      barCodeController.text = listData.first.barCode;
+      // barCodeController.text = listData.first.barCode;
       isBarcodeEnable = false;
       disableUnitList = getSelectedUnits(listData);
+      itemNameController.text = listData.first.itemName ?? "";
 
       if (disableUnitList.isNotEmpty) {
         final missingUnits = getMissingUnits(listData);
@@ -198,7 +201,7 @@ class CreateItemProvider extends ChangeNotifier {
     disableUnitList.clear();
     unitList.clear();
     selectedProductUnit = "";
-    barCodeController.clear();
+    // barCodeController.clear();
     isBarcodeEnable = true;
     notifyListeners();
 
@@ -218,7 +221,8 @@ class CreateItemProvider extends ChangeNotifier {
         if (unitList.isNotEmpty) {
           final listData = await getProductsById(scanValue);
           if (listData.isNotEmpty) {
-            barCodeController.text = listData.first.barCode;
+            // barCodeController.text = listData.first.barCode;
+            itemNameController.text = listData.first.itemName ?? "";
             isBarcodeEnable = false;
           }
         }
@@ -253,11 +257,11 @@ class CreateItemProvider extends ChangeNotifier {
     );
 
     if (res is String && res != '-1') {
-      barCodeController.text = res;
+      // barCodeController.text = res;
       notifyListeners();
     } else {
       if (res == '-1') {
-        barCodeController.text = "";
+        // barCodeController.text = "";
         notifyListeners();
         showErrorDialog(context, 'Có lỗi xảy ra khi quét Barcode');
       }
@@ -358,13 +362,13 @@ class CreateItemProvider extends ChangeNotifier {
   // }
 
   Future<void> chooseImageFromGallery(BuildContext context) async {
-    if (images.length >= 5) {
-      showErrorDialog(
-        context,
-        'Chỉ cho phép tối đa 5 ảnh',
-      );
-      return;
-    }
+    // if (images.length >= 5) {
+    //   showErrorDialog(
+    //     context,
+    //     'Chỉ cho phép tối đa 5 ảnh',
+    //   );
+    //   return;
+    // }
 
     final List<XFile> pickedFiles = await picker.pickMultiImage(
       maxWidth: 1024,
@@ -394,20 +398,19 @@ class CreateItemProvider extends ChangeNotifier {
       }
 
       if (validImages.isNotEmpty) {
-        if (images.length + validImages.length <= 5) {
-          images.addAll(validImages);
-          notifyListeners();
-        } else {
-          showError = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            showErrorDialog(
-              context,
-              'Không thể thêm hơn 5 ảnh',
-            );
-          });
-        }
+        // if (images.length + validImages.length <= 5) {
+        images.addAll(validImages);
+        notifyListeners();
+        // } else {
+        //   showError = true;
+        //   WidgetsBinding.instance.addPostFrameCallback((_) {
+        //     showErrorDialog(
+        //       context,
+        //       'Không thể thêm hơn 5 ảnh',
+        //     );
+        //   });
+        // }
       }
-
       if (!showError) {
         Navigator.pop(context);
       }
@@ -487,12 +490,16 @@ class CreateItemProvider extends ChangeNotifier {
       if (formKey.currentState?.validate() == true &&
           selectedProductUnit.isNotEmpty) {
         bool isConnected = await networkHelper.isConnected();
-        if (isConnected) {
+        if (images.isEmpty) {
+          showErrorDialog(context, 'Xin vui lòng thêm ảnh, ảnh là bắt buộc');
+        }
+        if (isConnected && images.isNotEmpty) {
           final bool result = await createItem();
           if (result) {
             Navigator.pop(context, itemCodeController.text);
           }
-        } else {
+        }
+        if (isConnected == false) {
           showErrorDialog(context,
               'Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.');
         }
@@ -506,9 +513,55 @@ class CreateItemProvider extends ChangeNotifier {
     }
   }
 
+  // Future<bool> createItem() async {
+  //   try {
+  //     // Convert and parse dimensions
+  //     final length = int.parse(UnitUtils.convertLength(
+  //         lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
+  //     final width = int.parse(UnitUtils.convertLength(
+  //         widthController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
+  //     final height = int.parse(UnitUtils.convertLength(
+  //         heightController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
+
+  //     final weight = weightController.text.isNotEmpty
+  //         ? int.parse(UnitUtils.convertWeight(weightController.text,
+  //             selectedLengthUnit, WeightUnitEnum.mg.name))
+  //         : 0;
+
+  //     final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  //     final userName = prefs.getString(AppSPKey.userName);
+
+  //     final body = ProductModel(
+  //       itemCode: itemCodeController.text,
+  //       // itemName: ,
+  //       barCode: barCodeController.text,
+  //       unitOfMeasure: selectedProductUnit,
+  //       length: length,
+  //       width: width,
+  //       height: height,
+  //       weight: weight,
+  //       createDate: DateTime.now(),
+  //       createBy: userName ?? "App Mobile",
+  //     );
+
+  //     final response = await apiService.createItem(body);
+
+  //     if (response.productId != null) {
+  //       if (images.isNotEmpty) {
+  //         return await uploadImage(response.productId!);
+  //       }
+  //       return true;
+  //     }
+
+  //     return false;
+  //   } catch (e) {
+  //     debugPrint('Error creating item: $e');
+  //     return false;
+  //   }
+  // }
   Future<bool> createItem() async {
     try {
-      // Convert and parse dimensions
       final length = int.parse(UnitUtils.convertLength(
           lengthController.text, selectedLengthUnit, LengthUnitEnum.mm.name));
       final width = int.parse(UnitUtils.convertLength(
@@ -522,31 +575,45 @@ class CreateItemProvider extends ChangeNotifier {
           : 0;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final userName = prefs.getString(AppSPKey.userName) ?? "App Mobile";
 
-      final userName = prefs.getString(AppSPKey.userName);
+      FormData formData = FormData.fromMap({
+        "ItemCode": itemCodeController.text,
+        "BarCode": itemCodeController.text,
+        "UnitOfMeasure": selectedProductUnit,
+        "Length": length.toString(),
+        "Width": width.toString(),
+        "Height": height.toString(),
+        "Weight": weight.toString(),
+        "CreateBy": userName,
+      });
 
-      final body = ProductModel(
-        itemCode: itemCodeController.text,
-        barCode: barCodeController.text,
-        unitOfMeasure: selectedProductUnit,
-        length: length,
-        width: width,
-        height: height,
-        weight: weight,
-        createDate: DateTime.now(),
-        createBy: userName ?? "App Mobile",
-      );
-
-      final response = await apiService.createItem(body);
-
-      if (response.productId != null) {
-        if (images.isNotEmpty) {
-          return await uploadImage(response.productId!);
-        }
-        return true;
+      for (var image in images) {
+        formData.files.add(MapEntry(
+          "files",
+          await MultipartFile.fromFile(image.path, filename: image.name),
+        ));
       }
 
-      return false;
+      // // Gửi request
+      // final response = await dio.post(
+      //   '$baseUrl/api/ScanProduct/create-scan-product-data',
+      //   data: formData,
+      //   options: Options(headers: {'Content-Type': 'multipart/form-data'}),
+      // );
+
+      // if (response.statusCode == 200) {
+      //   return true;
+      // } else {
+      //   _handleErrorDialog("Có lỗi xảy ra. Mã lỗi: ${response.statusCode}");
+      //   return false;
+      // }
+      final respose = await apiService.postFormData(formData);
+      if (respose != null) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (e) {
       debugPrint('Error creating item: $e');
       return false;

@@ -28,6 +28,7 @@ Map<String, dynamic> _$ResponseModelToJson(ResponseModel instance) =>
 
 ProductModel _$ProductModelFromJson(Map<String, dynamic> json) => ProductModel(
       itemCode: json['itemCode'] as String,
+      itemName: json['itemName'] as String?,
       barCode: json['barCode'] as String,
       unitOfMeasure: json['unitOfMeasure'] as String,
       length: (json['length'] as num).toInt(),
@@ -48,6 +49,7 @@ ProductModel _$ProductModelFromJson(Map<String, dynamic> json) => ProductModel(
 Map<String, dynamic> _$ProductModelToJson(ProductModel instance) =>
     <String, dynamic>{
       'itemCode': instance.itemCode,
+      'itemName': instance.itemName,
       'barCode': instance.barCode,
       'unitOfMeasure': instance.unitOfMeasure,
       'length': instance.length,

@@ -127,10 +127,8 @@ class _HomeChildState extends State<HomeChild> {
             ),
           ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          height: value.scanProduct != "" && value.locationData == ""
-              ? MediaQuery.of(context).size.height / 4.3
-              : MediaQuery.of(context).size.height / 5.5,
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.min,
@@ -152,6 +150,9 @@ class _HomeChildState extends State<HomeChild> {
                 },
                 title: 'Cập nhật',
                 btnColor: Colors.green[300],
+              ),
+              const SizedBox(
+                height: 16,
               ),
               CustomButton(
                 onTap: () async {
@@ -311,6 +312,13 @@ class _HomeChildState extends State<HomeChild> {
                       DataColumn(
                         label: Container(
                           padding: const EdgeInsets.all(8.0),
+                          child: const Text('Tên sản phẩm',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Container(
+                          padding: const EdgeInsets.all(8.0),
                           child: const Text('Barcode',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
@@ -376,7 +384,7 @@ class _HomeChildState extends State<HomeChild> {
                                   ),
                                 ),
                                 ...List.generate(
-                                  7,
+                                  8,
                                   (index) => DataCell(Container()),
                                 ),
                               ],
@@ -417,6 +425,12 @@ class _HomeChildState extends State<HomeChild> {
                                     child: Center(
                                         child: Text(value
                                             .dataList[rowIndex].itemCode
+                                            .toString())),
+                                  )),
+                                  DataCell(Container(
+                                    child: Center(
+                                        child: Text(value
+                                            .dataList[rowIndex].itemName
                                             .toString())),
                                   )),
                                   DataCell(Container(

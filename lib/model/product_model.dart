@@ -48,6 +48,8 @@ class ResponseModel {
 class ProductModel {
   @JsonKey(name: "itemCode")
   final String itemCode;
+  @JsonKey(name: "itemName")
+  final String? itemName;
   @JsonKey(name: "barCode")
   final String barCode;
   @JsonKey(name: "unitOfMeasure")
@@ -73,6 +75,7 @@ class ProductModel {
 
   ProductModel({
     required this.itemCode,
+    this.itemName,
     required this.barCode,
     required this.unitOfMeasure,
     required this.length,
@@ -88,6 +91,7 @@ class ProductModel {
 
   ProductModel copyWith({
     String? itemCode,
+    String? itemName,
     String? barCode,
     String? unitOfMeasure,
     int? length,
@@ -102,6 +106,7 @@ class ProductModel {
   }) =>
       ProductModel(
         itemCode: itemCode ?? this.itemCode,
+        itemName: itemName ?? this.itemName,
         barCode: barCode ?? this.barCode,
         unitOfMeasure: unitOfMeasure ?? this.unitOfMeasure,
         length: length ?? this.length,

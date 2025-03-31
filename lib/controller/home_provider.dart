@@ -162,10 +162,10 @@ class HomeProvider extends ChangeNotifier {
         await Future.wait([
           apiService.getProductsById(scanCode).then((data) => dataList = data),
           apiService.getUnitById(scanCode).then((units) => unitList = units),
-          apiService
-              .fetchProducts(pageNumber: 1, pageSize: 10, itemNumber: scanCode)
-              .then((value) =>
-                  locationData = value.data?.first.locationCode ?? ""),
+          apiService.fetchProducts(
+              pageNumber: 1, pageSize: 10, itemNumber: scanCode),
+          // .then((value) =>
+          //     locationData = value.data?.first.locationCode ?? ""),
         ]);
         notifyListeners();
       } catch (e) {
