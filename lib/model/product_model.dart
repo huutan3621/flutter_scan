@@ -51,7 +51,7 @@ class ProductModel {
   @JsonKey(name: "itemName")
   final String? itemName;
   @JsonKey(name: "barCode")
-  final String barCode;
+  final String? barCode;
   @JsonKey(name: "unitOfMeasure")
   final String unitOfMeasure;
   @JsonKey(name: "length")
@@ -76,7 +76,7 @@ class ProductModel {
   ProductModel({
     required this.itemCode,
     this.itemName,
-    required this.barCode,
+    this.barCode,
     required this.unitOfMeasure,
     required this.length,
     required this.width,

@@ -316,13 +316,13 @@ class _HomeChildState extends State<HomeChild> {
                               style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
-                      DataColumn(
-                        label: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          child: const Text('Barcode',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                      ),
+                      // DataColumn(
+                      //   label: Container(
+                      //     padding: const EdgeInsets.all(8.0),
+                      //     child: const Text('Barcode',
+                      //         style: TextStyle(fontWeight: FontWeight.bold)),
+                      //   ),
+                      // ),
                       DataColumn(
                         label: Container(
                           padding: const EdgeInsets.all(8.0),
@@ -384,7 +384,7 @@ class _HomeChildState extends State<HomeChild> {
                                   ),
                                 ),
                                 ...List.generate(
-                                  8,
+                                  7,
                                   (index) => DataCell(Container()),
                                 ),
                               ],
@@ -433,11 +433,11 @@ class _HomeChildState extends State<HomeChild> {
                                             .dataList[rowIndex].itemName
                                             .toString())),
                                   )),
-                                  DataCell(Container(
-                                    child: Center(
-                                        child: Text(
-                                            value.dataList[rowIndex].barCode)),
-                                  )),
+                                  // DataCell(Container(
+                                  //   child: Center(
+                                  //       child: Text(
+                                  //           value.dataList[rowIndex].barCode)),
+                                  // )),
                                   DataCell(Container(
                                     child: Center(
                                         child: Text(value

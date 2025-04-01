@@ -257,7 +257,9 @@ class ApiService {
     final response = await dio.post(
       '$baseUrl/api/ScanProduct/create-scan-product-data',
       data: formData,
-      options: Options(headers: {'Content-Type': 'multipart/form-data'}),
+      options: Options(
+          headers: {'Content-Type': 'multipart/form-data'},
+          receiveTimeout: const Duration(seconds: 1)),
     );
 
     if (response.statusCode == 200) {
